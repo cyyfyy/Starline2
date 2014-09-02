@@ -348,7 +348,7 @@ public class Robot {
 		case "IF": //TODO: MAKE THIS WORK WITH VARIABLES
 			int first = popNumber();
 			int second = popNumber();
-			if (second == 0) {
+			if (second == 1) {
 				return opCall(first);
 			}
 			return 1;

@@ -170,17 +170,23 @@ public class Game extends Canvas implements GameWindowCallback {
 		Program challengerProgram = new Program(new File("robots/challenger.txt"));
 		Program newguyProgram = new Program(new File("robots/newguy.txt"));
 		Program bounceProgram = new Program(new File("robots/bounce.txt"));
+		Program followerProgram = new Program(new File("robots/follower.txt"));
 
 		//add robots to the game
-		addRobot(new Robot("Challenger2", bounceProgram, challenger));
-		addRobot(new Robot("Challenger2", bounceProgram, challenger));
-		addRobot(new Robot("Challenger2", bounceProgram, challenger));
-		addRobot(new Robot("Challenger2", bounceProgram, challenger));
-
-		addRobot(new Robot("Challenger2", challengerProgram, challenger));
-		addRobot(new Robot("Challenger2", challengerProgram, challenger));
-		addRobot(new Robot("Challenger2", challengerProgram, challenger));
-		addRobot(new Robot("Challenger2", challengerProgram, challenger));
+//		addRobot(new Robot("Bounce1", bounceProgram, challenger));
+//		addRobot(new Robot("Bounce2", bounceProgram, challenger));
+//		addRobot(new Robot("Bounce3", bounceProgram, challenger));
+//		addRobot(new Robot("Bounce4", bounceProgram, challenger));
+//
+//		addRobot(new Robot("Challenger1", challengerProgram, challenger));
+//		addRobot(new Robot("Challenger2", challengerProgram, challenger));
+//		addRobot(new Robot("Challenger3", challengerProgram, challenger));
+//		addRobot(new Robot("Challenger4", challengerProgram, challenger));
+		
+		addRobot(new Robot("Follower1", followerProgram, challenger));
+		addRobot(new Robot("Follower2", followerProgram, challenger));
+		addRobot(new Robot("Follower3", followerProgram, challenger));
+		addRobot(new Robot("Follower4", followerProgram, challenger));
 	}
 
 	public static boolean isVariable(String instruction) {
