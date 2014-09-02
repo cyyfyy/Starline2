@@ -12,7 +12,6 @@ public class Program {
 
 	String[] instructions;
 	int[] lineNumbers;
-	//	private String errors;
 	public int address = 0;
 	public int lineNumber = 0;
 	String currentLine;
@@ -22,7 +21,6 @@ public class Program {
 
 	public Program(File code) throws FileNotFoundException
 	{
-		//		errors = "";
 		instructions = new String[MAX_LENGTH];
 		lineNumbers = new int[MAX_LENGTH];
 		Scanner io = new Scanner(code);
@@ -31,9 +29,6 @@ public class Program {
 			currentLine = io.next();
 			pushInstructions(currentLine);
 		}
-
-		// this.label_to_address = {};
-		// this.address_to_label = {};
 		io.close();
 	}
 

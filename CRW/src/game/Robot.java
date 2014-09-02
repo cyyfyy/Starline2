@@ -17,10 +17,6 @@ public class Robot {
 
 	int stasis;
 
-
-	//	int speedX;
-	//	int speedY;
-
 	boolean touchingWall;
 	boolean alive;
 	boolean colliding;
@@ -52,37 +48,26 @@ public class Robot {
 	{
 		hull = 100;
 		radius = 8;
-		//energy = 100;
 
 		stasis = 0;
-
-		//	speedX = 0;
-		//	speedY = 0;
 
 		touchingWall = false;
 		alive = true;
 		colliding = false;
 
 		name = n;
-		// this.color = color;
 		program = p;
 		image = i;
 		processorSpeed = 10;
 		chronons = 0;
 		maxEnergy = 150;
 		maxShield = 30;
-		//  this.set_trace(false);
-		arena = null;  // Set later by Game.add_robot().
+		arena = null;  // Set later by the game
 
-		//this.registers = {};
-		//this.vector = [];
-		//this.stack = [];
+		// registers = {}; //TODO: add registers
+
 		ptr = 0;
 		last_ptr = 0;
-
-		//	this.probe_variable = new Variable('DAMAGE');
-		//	this.history_index;
-		//	this.history = _.range(50);
 
 		aim = 90;
 		scan = 0;
@@ -90,12 +75,12 @@ public class Robot {
 		energy = maxEnergy;
 		shield = 0;
 		stasis = 0;
-		this.x = (int)(Math.random()*1000);
-		this.y = (int)(Math.random()*1000);
-		this.vx = 0;
-		this.vy = 0;
-		this.interrupts = new InterQueue();
-		this.stack = new Stack<Object>();
+		 x = (int)(Math.random()*1000);
+		 y = (int)(Math.random()*1000);
+		 vx = 0;
+		 vy = 0;
+		 interrupts = new InterQueue();
+		 stack = new Stack<Object>();
 		bulletType = "NORMAL";
 	}
 
@@ -115,15 +100,13 @@ public class Robot {
 	 */
 	protected void step() {
 		chronons++;
-		//this.trace('------ ' + this.chronons + ' ------');
-		//	System.out.println("------ " + this.chronons + " ------");
+		//	System.out.println("------ " +  chronons + " ------");
 
-		if (this.stasis > 0) {
-			this.stasis--;
+		if ( stasis > 0) {
+			 stasis--;
 
 
-			System.out.println("In stasis for " + this.stasis + " more chronons");
-			// this.trace('In stasis for ' + this.stasis + ' more chronons');
+			System.out.println("In stasis for " +  stasis + " more chronons");
 			return;
 		}
 
@@ -133,14 +116,13 @@ public class Robot {
 
 		energy = Math.min(maxEnergy, energy + 2);
 
-		if (this.touchingWall) 
+		if ( touchingWall) 
 		{
-			//System.out.println("wall damage");
-			this.takeDamage(5);
+			 takeDamage(5);
 		}
-		if (this.colliding) 
+		if ( colliding) 
 		{
-			this.takeDamage(1);
+			 takeDamage(1);
 		}
 
 		if (hull <= 0)
@@ -148,8 +130,8 @@ public class Robot {
 			alive = false;
 		}
 		if (energy < -200) alive = false;
-		// if (this.damage <= 0) this.colliding = false;
-		//  if (this.energy < -200) this.colliding = false;
+		if (hull <= 0)  colliding = false;
+		if (energy < -200)  colliding = false;
 
 		if (shield > maxShield)
 		{
@@ -178,42 +160,42 @@ public class Robot {
 				}
 			}
 
-			if (this.hull < this.interrupts.getParam("DAMAGE")) //make separate damage field?
-				this.interrupts.add("DAMAGE");
-			if (this.shield < this.interrupts.getParam("SHIELD"))
-				this.interrupts.add("SHIELD");
+			if ( hull <  interrupts.getParam("DAMAGE"))
+				 interrupts.add("DAMAGE");
+			if ( shield <  interrupts.getParam("SHIELD"))
+				 interrupts.add("SHIELD");
 
-			if (this.y < this.interrupts.getParam("TOP")) {
-				if (!this.wasAtTop) {
-					this.interrupts.add("TOP");
-					this.wasAtTop = true;
+			if ( y <  interrupts.getParam("TOP")) {
+				if (! wasAtTop) {
+					 interrupts.add("TOP");
+					 wasAtTop = true;
 				}
 			} else {
-				this.wasAtTop = false;
+				 wasAtTop = false;
 			}
-			if (this.y > this.interrupts.getParam("BOTTOM")) {
-				if (!this.wasAtBottom) {
-					this.interrupts.add("BOTTOM");
-					this.wasAtBottom = true;
+			if ( y >  interrupts.getParam("BOTTOM")) {
+				if (! wasAtBottom) {
+					 interrupts.add("BOTTOM");
+					 wasAtBottom = true;
 				}
 			} else {
-				this.wasAtBottom = false;
+				 wasAtBottom = false;
 			}
-			if (this.x < this.interrupts.getParam("LEFT")) {
-				if (!this.wasAtLeft) {
-					this.interrupts.add("LEFT");
-					this.wasAtLeft = true;
+			if ( x <  interrupts.getParam("LEFT")) {
+				if (! wasAtLeft) {
+					 interrupts.add("LEFT");
+					 wasAtLeft = true;
 				}
 			} else {
-				this.wasAtLeft = false;
+				 wasAtLeft = false;
 			}
-			if (this.x > this.interrupts.getParam("RIGHT")) {
-				if (!this.wasAtRight) {
-					this.interrupts.add("RIGHT");
-					this.wasAtRight = true;
+			if ( x >  interrupts.getParam("RIGHT")) {
+				if (! wasAtRight) {
+					 interrupts.add("RIGHT");
+					 wasAtRight = true;
 				}
 			} else {
-				this.wasAtRight = false;
+				 wasAtRight = false;
 			}
 
 			checkRadarInterrupt();
@@ -223,22 +205,20 @@ public class Robot {
 			// TODO: SIGNAL interrupt. Teamplay not yet implemented.
 			// TODO: ROBOTS interrupt.
 
-			if (this.chronons >= this.interrupts.getParam("CHRONON")) {
-				this.interrupts.add("CHRONON");
+			if ( chronons >=  interrupts.getParam("CHRONON")) {
+				 interrupts.add("CHRONON");
 			}
 		}
 
-		for (int i = this.processorSpeed; i > 0 && this.alive; ) {
-			if (this.energy <= 0) {
+		for (int i =  processorSpeed; i > 0 &&  alive; ) {
+			if ( energy <= 0) {
 				//System.out.println("Robot has no energy");
-				//this.trace("Robot has no energy");
 				break;
 			}
 			try {
 				if (interrupts.enabled && interrupts.hasNext()) {
 					interrupts.enabled = false;
 					String next = interrupts.next();
-					// this.trace("Executing interrupt " + next);
 					System.out.println("Executing interrupt " + next);
 					opCall(interrupts.getPtr(next));
 				}
@@ -246,26 +226,24 @@ public class Robot {
 				i -= stepOne();
 			} catch (Exception e) {
 				int line = last_ptr;
-				//int line = program.getLineNumbers()[last_ptr];
 				String instruction = program.instructions[last_ptr];
 				String message = name + " error on line " + line + ", at " + instruction;
 				System.out.println(message + "\n\n" + e);
-				this.colliding = false;
+				 colliding = false;
 				i-=1;
 			}
 		}
 
-		int r = this.radius;
-		this.x = Math.max(r, Math.min(this.arena.width - r, this.x + this.vx));
-		this.y = Math.max(r, Math.min(this.arena.height - r, this.y + this.vy));
+		int r =  radius;
+		 x = Math.max(r, Math.min( arena.width - r,  x +  vx));
+		 y = Math.max(r, Math.min( arena.height - r,  y +  vy));
 
-		this.wasColliding = this.colliding;
-		this.wasOnWall = this.touchingWall;
+		 wasColliding =  colliding;
+		 wasOnWall =  touchingWall;
 	}
 
 	private int opCall(int address) 
 	{
-		// this.trace('Jumping to', this.program.address_to_label[address], 'with return');
 		int returnAddr = ptr;
 		ptr = address;
 		stack.push(returnAddr);
@@ -274,17 +252,11 @@ public class Robot {
 
 	private int stepOne() 
 	{
-		//this.debug_stack();
 		String instruction = program.instructions[ptr];
-		//System.out.println(instruction);
 		if (ptr >= program.numberOfInstructions)
 			throw new Error("Program finished");
 		if (instruction == null)
-			throw new Error("Undefined instruction");
-		//		this.trace(
-		//				pad('L' + this.program.lineNumbers[ptr], 6),
-		//				pad("" + instruction.toString(), 15),
-		//				this.debug_stack());
+			throw new Error("Undefined instruction: " + instruction);
 
 		last_ptr = ptr;
 		ptr++;
@@ -296,24 +268,14 @@ public class Robot {
 			int value = Integer.parseInt(instruction);
 			stack.push(value);
 			return 1;
-		} else if (Operator.isOperator(instruction)) {
-			return this.handleOperation(instruction);
+		} else if (Operator.isOperator(instruction)) { //always true for now TODO: fix this
+			return  handleOperation(instruction);
 		}
 		return 1;
 	}
-
-	//	private void push(Object instructions)
-	//	{
-	//		if (instructions == null)
-	//			throw new Error("null pushed onto the stack");
-	//		this.stack.push(instructions);
-	//		if (this.stack.size() > 100) {
-	//			throw new Error("Stack overflow");
-	//		}
-	//	}
-
+	
 	private int handleOperation(String op) {
-		Stack<Object> s = this.stack;
+		//Stack<Object> s =  stack;
 
 		switch (op) {
 		case "+": return opApply2(op);
@@ -352,15 +314,15 @@ public class Robot {
 		//		case "ARCSIN": return opTrig(op);
 		//		case "ARCCOS": return opTrig(op);
 		//		case "ARCTAN":
-		//			int i = this.popNumber();
-		//			int j = this.popNumber();
+		//			int i =  popNumber();
+		//			int j =  popNumber();
 		//			double result = Math.atan2(-i, j);  // Flip Y coord.
 		//			// Robowar"s Engine/Arena.c does this, so I will:
-		//			this.push((int)(450.5 - Arena.rad2deg(result)) % 360);
+		//			 push((int)(450.5 - Arena.rad2deg(result)) % 360);
 		//			return 1;
 		//			//		case "DIST":
-		//			//			int dy = this.y - this.pop_number();
-		//			//			int dx = this.x - this.pop_number();
+		//			//			int dy =  y -  pop_number();
+		//			//			int dx =  x -  pop_number();
 		//			//			return Math.sqrt( (dx * dx) + (dy * dy) );
 
 		case "STORE":
@@ -370,17 +332,17 @@ public class Robot {
 			useVariable(v, popNumber());
 			return 1;
 			//		case "RECALL":
-			//			this.push(this.pop_variable_value());
+			//			 push( pop_variable_value());
 			//			return 1;
 			//		case "VEXEC":
-			//			var index = this.pop_number();
-			//			var value = this.pop_number();
-			//			this.vector[index] = value;
+			//			var index =  pop_number();
+			//			var value =  pop_number();
+			//			 vector[index] = value;
 			//			return 1;
 			//		case "VRECALL":
-			//			var index = this.pop_number();
-			//			var value = this.vector[index] || 0;
-			//			this.push((value < 0 || value > 100) ? 0 : value);
+			//			var index =  pop_number();
+			//			var value =  vector[index] || 0;
+			//			 push((value < 0 || value > 100) ? 0 : value);
 			//			return 1;
 			//
 		case "IF": //TODO: MAKE THIS WORK WITH VARIABLES
@@ -391,33 +353,33 @@ public class Robot {
 			}
 			return 1;
 			//		case "IFE":
-			//			var first = this.pop_number();
-			//			var second = this.pop_number();
-			//			var third = this.pop_number();
+			//			var first =  pop_number();
+			//			var second =  pop_number();
+			//			var third =  pop_number();
 			//			if (third) {
-			//				return this.op_call(second);
+			//				return  op_call(second);
 			//			} else {
-			//				return this.op_call(first);
+			//				return  op_call(first);
 			//			}
 			//		case "IFG":
-			//			var first = this.pop_number();
-			//			var second = this.pop_number();
+			//			var first =  pop_number();
+			//			var second =  pop_number();
 			//			if (second) {
-			//				return this.op_jump(first);
+			//				return  op_jump(first);
 			//			}
 			//			return 1;
 			//		case "IFEG":
-			//			var first = this.pop_number();
-			//			var second = this.pop_number();
-			//			var third = this.pop_number();
+			//			var first =  pop_number();
+			//			var second =  pop_number();
+			//			var third =  pop_number();
 			//			if (third) {
-			//				return this.op_jump(second);
+			//				return  op_jump(second);
 			//			} else {
-			//				return this.op_jump(first);
+			//				return  op_jump(first);
 			//			}
 			//
 			//		case "CALL":
-			//			return this.op_call(this.pop_number());
+			//			return  op_call( pop_number());
 		case "JUMP":
 		case "RETURN":
 			return opJump(popNumber());
@@ -432,31 +394,31 @@ public class Robot {
 			return 1;
 			//		case "DUP":
 			//		case "DUPLICATE":
-			//			var value = this.pop_number();
-			//			this.stack.push(value);
-			//			this.stack.push(value);
+			//			var value =  pop_number();
+			//			 stack.push(value);
+			//			 stack.push(value);
 			//			return 1;
 		case "DROPALL":
 			stack.clear();
 			return 1;
 			//		case "SWAP":
-			//			var first = this.pop_number();
-			//			var second = this.pop_number();
-			//			this.push(first);
-			//			this.push(second);
+			//			var first =  pop_number();
+			//			var second =  pop_number();
+			//			 push(first);
+			//			 push(second);
 			//			return 1;
 			//		case "ROLL":
-			//			var count = this.pop_number();
-			//			var value = this.pop_number();
-			//			if (count > this.stack.length)
+			//			var count =  pop_number();
+			//			var value =  pop_number();
+			//			if (count >  stack.length)
 			//				throw new Error("Tried rolling back " + count + " places, but " +
-			//						"only " + this.stack.length + " items are in the stack.");
+			//						"only " +  stack.length + " items are in the stack.");
 			//			Stack temp = new Stack();
 			//			for (var i = 0; i < count; i ++)
-			//				temp.push(this.stack.pop());
-			//			this.stack.push(value);
+			//				temp.push( stack.pop());
+			//			 stack.push(value);
 			//			for (var i = 0; i < count; i ++)
-			//				this.stack.push(temp.pop());
+			//				 stack.push(temp.pop());
 			//			return 1;
 
 		case "INTON":
@@ -478,16 +440,16 @@ public class Robot {
 			interrupts.setPtr(l, address);
 			return 1;
 			//		case "SETPARAM":
-			//			var v = this.pop_variable();
+			//			var v =  pop_variable();
 			//			if (v.name == "HISTORY") {
-			//				var value = this.pop_number();
-			//				this.history_index = value;
+			//				var value =  pop_number();
+			//				 history_index = value;
 			//			} else if (v.name == "PROBE") {
-			//				var value = this.pop_variable();
-			//				this.probe_variable = value;
+			//				var value =  pop_variable();
+			//				 probe_variable = value;
 			//			} else {
-			//				var value = this.pop_number();
-			//				this.interrupts.set_param(v.name, value);
+			//				var value =  pop_number();
+			//				 interrupts.set_param(v.name, value);
 			//			}
 			//			return 1;
 			//
@@ -520,8 +482,8 @@ public class Robot {
 
 	private int opJump(int popNumber) {
 		int address = popNumber;
-		// this.trace('Go to', this.program.address_to_label[address]);
-		this.ptr = address;
+		//  trace('Go to',  program.address_to_label[address]);
+		 ptr = address;
 		return 1;
 	}
 
@@ -531,10 +493,10 @@ public class Robot {
 
 
 	private String popVariable() {
-		if (this.stack.size() == 0) {
+		if ( stack.size() == 0) {
 			throw new Error("Stack empty");
 		}
-		Object value = this.stack.pop();
+		Object value =  stack.pop();
 		if (!(value instanceof String)) {
 			throw new Error("Invalid value on stack: " + value + " is not a Variable");
 		} else {
@@ -550,10 +512,10 @@ public class Robot {
 			checkRangeInterrupt();
 			return;
 			//      case "BULLET":
-			//       if (this.bullet_type == "EXPLOSIVE")
-			//          this.shoot("NORMAL_BULLET", value);
+			//       if ( bullet_type == "EXPLOSIVE")
+			//           shoot("NORMAL_BULLET", value);
 			//        else
-			//          this.shoot(this.bullet_type + "_BULLET", value);
+			//           shoot( bullet_type + "_BULLET", value);
 			//        return;
 		case "BOTTOM":
 		case "BOT":
@@ -570,14 +532,14 @@ public class Robot {
 		case "ENERGY":
 			return;
 		case "FIRE":
-			this.shoot(this.bulletType, value);
+			 shoot( bulletType, value);
 			return;
 			//		case "FRIEND":
 			//			throw new Error("Teamplay not yet implemented");
 			//		case "HISTORY":
 			//			return;
 			//		case "HELLBORE":
-			//			this.shoot(name, value);
+			//			 shoot(name, value);
 			//			return;
 			//		case "ICON0":
 			//		case "ICON1":
@@ -598,23 +560,23 @@ public class Robot {
 		case "LEFT":
 			return;
 			//		case "LOOK":
-			//			this.checkRadarInterrupt();
-			//			this.look = value;
+			//			 checkRadarInterrupt();
+			//			 look = value;
 			//			return;
 			//		case "MINE":
-			//			this.shoot(name, value);
+			//			 shoot(name, value);
 			//			return;
 			//		case "MISSILE":
-			//			this.shoot(name, value);
+			//			 shoot(name, value);
 			//			return;
 		case "MOVEX":
-			this.teleport("x", value);
+			 teleport("x", value);
 			return;
 		case "MOVEY":
-			this.teleport("y", value);
+			 teleport("y", value);
 			return;
 			//		case "NUKE":
-			//			this.shoot(name, value);
+			//			 shoot(name, value);
 			//			return;
 			//		case "PROBE":
 			//		case "RADAR":
@@ -626,24 +588,24 @@ public class Robot {
 			//		case "ROBOTS":
 			//			return;
 			//		case "SCAN":
-			//			this.checkRangeInterrupt();
-			//			this.scan = fix360(value);
+			//			 checkRangeInterrupt();
+			//			 scan = fix360(value);
 			//			return;
 		case "SHIELD":
 			value = Math.max(0, value);
-			if (this.shield < value) {
-				int cost = value - this.shield;
-				if (this.energy < cost) {
-					this.shield += (this.energy);
-					this.energy = 0;
+			if ( shield < value) {
+				int cost = value -  shield;
+				if ( energy < cost) {
+					 shield += ( energy);
+					 energy = 0;
 				} else {
-					this.shield = value;
-					this.energy -= cost;
+					 shield = value;
+					 energy -= cost;
 				}
-			} else if (this.shield > value) {
-				int gain = this.shield - value;
-				this.shield = value;
-				this.energy = Math.min(this.energy + gain, this.maxEnergy);
+			} else if ( shield > value) {
+				int gain =  shield - value;
+				 shield = value;
+				 energy = Math.min( energy + gain,  maxEnergy);
 			}
 			return;
 			//	      case "SIGNAL":
@@ -660,13 +622,13 @@ public class Robot {
 			//	      case "SND9":
 			//	        return;
 		case "SPEEDX":
-			this.setSpeed("x", value);
+			 setSpeed("x", value);
 			return;
 		case "SPEEDY":
-			this.setSpeed("y", value);
+			 setSpeed("y", value);
 			return;
 			//	      case "STUNNER":
-			//	        this.shoot(name, value);
+			//	         shoot(name, value);
 			//	        return;
 			//	      case "TEAMMATES":
 			//	        throw new Error("Teamplay not yet implemented");
@@ -678,15 +640,15 @@ public class Robot {
 			throw new Error("Robot tried to teleport by setting X or Y");
 
 			//default:
-			//   this.registers[name] = value;
+			//    registers[name] = value;
 		}
 	}
 
 	int getVariable(String name) {
 		// Resolve label names first. Some simpler bots have label names with the
 		// same name as variables.
-		//  if (name in this.program.label_to_address) {
-		//    return this.program.label_to_address[name];
+		//  if (name in  program.label_to_address) {
+		//    return  program.label_to_address[name];
 		//  }
 
 		switch (name) {
@@ -714,7 +676,7 @@ public class Robot {
 			//case "FRIEND":
 			//  throw new Error("Teamplay not yet implemented");
 			//case "HISTORY":
-			//  return this.history[this.history_index] || 0;
+			//  return  history[ history_index] || 0;
 		case "HELLBORE":
 			return 0;
 			//	      case "ICON0":
@@ -729,7 +691,7 @@ public class Robot {
 			//	      case "ICON9":
 			//	        return 0;
 			// case "ID":
-			//  return _.indexOf(this.arena.robots, this);
+			//  return _.indexOf( arena.robots, this);
 			// case "KILLS":
 			//   throw new Error("TODO: get_variable(" + name + ")");
 		case "LEFT":
@@ -743,7 +705,7 @@ public class Robot {
 		case "NUKE":
 			return 0;
 			// case "PROBE":
-			//   return this.do_probe();
+			//   return  do_probe();
 		case "RADAR":
 			return (int) arena.doRadar(this);
 		case "RANDOM":
@@ -772,9 +734,9 @@ public class Robot {
 		case "SND9":
 			return 0;
 		case "SPEEDX":
-			return this.vx;
+			return  vx;
 		case "SPEEDY":
-			return this.vy;
+			return  vy;
 		case "STUNNER":
 			return 0;
 			// case "TEAMMATES":
@@ -782,15 +744,15 @@ public class Robot {
 		case "TOP":
 			return 0;
 		case "WALL":
-			return this.touchingWall ? 1 : 0;
+			return  touchingWall ? 1 : 0;
 		case "X":
 			return x;
 		case "Y":
 			return y;
 
 			//   default:
-			//   if (name in this.registers) {
-			//      return this.registers[name];
+			//   if (name in  registers) {
+			//      return  registers[name];
 			//     }
 			//
 			// Allow for undefined A-Z registers.
@@ -804,14 +766,14 @@ public class Robot {
 	private void teleport(String axis, int energy)
 	{
 		int distance = (int)(energy / 2);
-		this.energy -= (int)(energy);
-		int r = this.radius;
+		 energy -= (int)(energy);
+		int r =  radius;
 		switch (axis) {
 		case "x":
-			this.x = Math.max(r, Math.min(this.arena.width - r, this.x + distance));
+			 x = Math.max(r, Math.min( arena.width - r,  x + distance));
 			break;
 		case "y":
-			this.y = Math.max(r, Math.min(this.arena.height - r, this.y + distance));
+			 y = Math.max(r, Math.min( arena.height - r,  y + distance));
 		}
 
 	}
@@ -824,14 +786,14 @@ public class Robot {
 	private void setSpeed(String axis, int speedParam) 
 	{
 		int value = speedParam;
-		if (Math.abs(value) > 5)//set max speed
+		if (Math.abs(value) > 10)//set max speed
 		{
 			if(value < 0){
-				value = -5;
+				value = -10;
 			}
 			else
 			{
-				value = 5;
+				value = 10;
 			}
 		}
 		switch (axis) {
@@ -853,10 +815,9 @@ public class Robot {
 
 
 	private void shoot(String type, int amount) {
-		amount = Math.min(amount, this.maxEnergy);
-		this.arena.shoot(this, type, amount);
-		this.energy -= amount;
-		// TOOD can't move and shoot
+		amount = Math.min(amount,  maxEnergy);
+		 arena.shoot(this, type, amount);
+		 energy -= amount;
 	}
 
 
@@ -867,10 +828,10 @@ public class Robot {
 
 
 	private int popNumber() {
-		if (this.stack.size() == 0) {
+		if ( stack.size() == 0) {
 			throw new Error("Stack empty");
 		}
-		Object value = this.stack.pop();
+		Object value =  stack.pop();
 		if (!(value instanceof Number)) {
 			throw new Error("Invalid value on stack: " + value + " is not a Number");
 		} else {
@@ -917,7 +878,7 @@ public class Robot {
 		case "<": stack.push(popNumber() < popNumber() ? 1 : 0); return 1;
 
 		//  case "AND": stack.push(popVariable() && popVariable() ? 1 : 0); return 1;
-		//  case "OR": return this.op_apply2(function(a, b) { return a || b ? 1 : 0 });
+		//  case "OR": return  op_apply2(function(a, b) { return a || b ? 1 : 0 });
 		}
 		return 1;
 	}
@@ -929,12 +890,12 @@ public class Robot {
 
 	protected boolean isTouching(Robot other)
 	{
-		return this.distanceTo(other) <= 0;
+		return  distanceTo(other) <= 0;
 	}
 
 	protected boolean isTouching(Projectile other)
 	{
-		return this.distanceTo(other) <= 0;
+		return  distanceTo(other) <= 0;
 	}
 
 	protected double distanceTo(Robot other) {
@@ -990,7 +951,7 @@ public class Robot {
 		double radar = arena.doRadar(this);
 		if (radar != 0 && radar <= interrupts.getParam("RADAR"))
 		{
-			this.interrupts.add("RADAR");
+			 interrupts.add("RADAR");
 		}
 	}
 
@@ -999,7 +960,7 @@ public class Robot {
 		if (range != 0 && range <= interrupts.getParam("RANGE"))
 		{
 			//System.out.println(range);
-			this.interrupts.add("RANGE");
+			 interrupts.add("RANGE");
 		}
 	}
 }

@@ -25,30 +25,16 @@ import projectiles.TacNuke;
 @SuppressWarnings("serial")
 public class Game extends Canvas implements GameWindowCallback {
 
-	//	/** The message to display which waiting for a key press */
-	//	private Java2DSprite message;
-	/** True if game logic needs to be applied this loop, normally as a result of a game event */
-	//private boolean logicRequiredThisLoop = false;
-
-	/** The time at which the last rendering looped started from the point of view of the game logic */
-	//	private long lastLoopTime = System.nanoTime();
 	/** The window that is being used to render the game */
 	private Java2DGameWindow window;
 
-	/** The time since the last record of fps */
-	//	private long lastFpsTime = 0;
-	/** The recorded fps */
-	//	private int fps;
-
 	private Arena arena;
 
-
-	//private Java2DSprite robot1;
-
 	/** The normal title of the window */
-	private String windowTitle = "ClarkU-RW v 0.1";
+	private String windowTitle = "Starline2_0_1";
 
-	//set up arena and scoreboard
+	//set up arena
+	//TODO: Scoreboard
 	int arenaHeight = 1000;
 	int arenaWidth = 1000;
 
@@ -56,7 +42,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	Stack<Robot> robots = new Stack<Robot>();
 	Stack<Projectile> projectiles = new Stack<Projectile>();
 
-	//speed controls
+	//TODO: speed controls
 	int time = 0; 
 
 	String[] vars = {	
@@ -129,12 +115,8 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	/**
 	 * Construct our game and set it running.
-	 * 
-	 * @param renderingType The type of rendering to use (should be one of the contansts from ResourceFactory)
 	 */
 	public Game() {
-		// create a window based on a chosen rendering method
-
 		window = ResourceFactory.get().getGameWindow();
 
 		window.setResolution(1000,1000);
@@ -150,26 +132,12 @@ public class Game extends Canvas implements GameWindowCallback {
 			e.printStackTrace();
 		}
 		window.startRendering();
-
-
-		// clear out any existing entities and initialize a new set
-
-		//entities.clear();
 	}
 
 	/**
-	 * Intialise the common elements for the game
+	 * Initialize the variable hash
 	 */
 	public void initialize() {
-		//gotYou = ResourceFactory.get().getSprite("sprites/gotyou.gif");
-		//pressAnyKey = ResourceFactory.get().getSprite("sprites/pressanykey.gif");
-		//youWin = ResourceFactory.get().getSprite("sprites/youwin.gif");
-
-		//message = pressAnyKey;
-
-		// setup the initial game state
-
-		//startGame();
 
 		int i = 0;
 		for(String var:vars)
@@ -180,8 +148,8 @@ public class Game extends Canvas implements GameWindowCallback {
 	}
 
 	/**
-	 * Initialise the starting state of the entities (ship and aliens). Each
-	 * entitiy will be added to the overall list of entities in the game.
+	 * Initialize the starting state of the entities. Each
+	 * entity will be added to the overall list of entities in the game.
 	 * @throws FileNotFoundException 
 	 */
 	private void initEntities() throws FileNotFoundException {
@@ -197,33 +165,22 @@ public class Game extends Canvas implements GameWindowCallback {
 			challenger = ImageIO.read(new File("resources/challenger.png"));
 		} catch (IOException e) {
 		}
+		
+		//import the programs
 		Program challengerProgram = new Program(new File("robots/challenger.txt"));
 		Program newguyProgram = new Program(new File("robots/newguy.txt"));
 		Program bounceProgram = new Program(new File("robots/bounce.txt"));
 
-		//this.addRobot(new Robot("Robot Two", testyProgram, testy));
-//		this.addRobot(new Robot("Robot One", challengerProgram, challenger));
-//		//this.addRobot(new Robot("Testy2", testyProgram, testy));
-		this.addRobot(new Robot("Challenger2", bounceProgram, challenger));
-		this.addRobot(new Robot("Challenger2", bounceProgram, challenger));
-		this.addRobot(new Robot("Challenger2", bounceProgram, challenger));
-		this.addRobot(new Robot("Challenger2", bounceProgram, challenger));
+		//add robots to the game
+		addRobot(new Robot("Challenger2", bounceProgram, challenger));
+		addRobot(new Robot("Challenger2", bounceProgram, challenger));
+		addRobot(new Robot("Challenger2", bounceProgram, challenger));
+		addRobot(new Robot("Challenger2", bounceProgram, challenger));
 
-		this.addRobot(new Robot("Challenger2", challengerProgram, challenger));
-		this.addRobot(new Robot("Challenger2", challengerProgram, challenger));
-		this.addRobot(new Robot("Challenger2", challengerProgram, challenger));
-		this.addRobot(new Robot("Challenger2", challengerProgram, challenger));
-//
-//		//this.addRobot(new Robot("Testy3", testyProgram, testy));
-//		this.addRobot(new Robot("Challenger3", newguyProgram, challenger));
-		//this.addRobot(new Robot("Testy4", testyProgram, testy));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
-//		this.addRobot(new Robot("Challenger4", newguyProgram, challenger));
+		addRobot(new Robot("Challenger2", challengerProgram, challenger));
+		addRobot(new Robot("Challenger2", challengerProgram, challenger));
+		addRobot(new Robot("Challenger2", challengerProgram, challenger));
+		addRobot(new Robot("Challenger2", challengerProgram, challenger));
 	}
 
 	public static boolean isVariable(String instruction) {
@@ -242,8 +199,6 @@ public class Game extends Canvas implements GameWindowCallback {
 	{
 		projectiles.push(p);
 	}
-
-	//public enum PType {RUBBER,NORMAL,EXPLOSIVE,HELLBORE,MINE,NUKE,ION,MISSILE};
 
 	protected static Projectile createProjectile(String type, int energy)
 	{
@@ -287,8 +242,11 @@ public class Game extends Canvas implements GameWindowCallback {
 			robot.step();
 			if(robot.alive)
 			{
+				//draw robots
 				window.getDrawGraphics().drawImage(robot.image, robot.x, robot.y, null);
-				
+
+				//draw aim reticule
+				//TODO: get a graphic for this
 				double aimRadians = robot.aim * (Math.PI + Math.PI) / 360;
 
 				int px = (int) (robot.x + Math.sin(aimRadians) * (robot.radius+7));
@@ -313,12 +271,12 @@ public class Game extends Canvas implements GameWindowCallback {
 				}
 				else
 				{
+					//draw projectiles
 					window.getDrawGraphics().drawImage(projectile.image, projectile.x, projectile.y, null);
 				}
 			}
 		}
 
-		//boolean colliding = false;
 		for (Robot a: robots) {
 			for (Robot b: robots) {
 				if (a == b) continue;
@@ -326,10 +284,6 @@ public class Game extends Canvas implements GameWindowCallback {
 					a.colliding = b.colliding = true;
 					a.vx = b.vx = 0;
 					a.vy = b.vy = 0;
-					// a.x = a.old_x;
-					// a.y = a.old_y;
-					// b.x = b.old_x;
-					// b.y = b.old_y;
 				}
 			}
 			for (Projectile projectile: projectiles) {
@@ -345,9 +299,9 @@ public class Game extends Canvas implements GameWindowCallback {
 						a.energy = 0;
 					} else if (projectile.isStasis) {
 						a.stasis += (int)(projectile.energy / 4);
-					} else {
+					} else {//TODO: take damage
 						a.hull -= projectile.energy;
-					//	System.out.println("hull after hit: " + a.hull);
+						//	System.out.println("hull after hit: " + a.hull);
 					}
 					//}
 				}
@@ -358,16 +312,9 @@ public class Game extends Canvas implements GameWindowCallback {
 				a.colliding = false;
 			}
 		}
-		//		//update score
-		//			if (robots.size() > 0 && time < 100000)
-		//		{
-		//				System.out.println(time);
-		//				loop(); //continue
-		//			}
-		//			else
-		//			{
-		//		//round is over
-		//			}
+//TODO: update scoreboard
+		
+		//remove projectiles and robots
 		Object[] pro = projectiles.toArray();
 		for(Object projectile: pro)
 		{
@@ -402,15 +349,16 @@ public class Game extends Canvas implements GameWindowCallback {
 	 * running game logic and rendering the scene.
 	 */
 	public void frameRendering() {		
+		//TODO: implement game ending screen which shows the winner and maybe some stats
 		//if (robots.size() > 1)
-	//	{
-			loop();
-	//	}
-	//	else
-	//	{
-	//		System.out.println("Winner is: " + robots.peek().name);
-	//		System.exit(0);
-	//	}
+		//	{
+		loop();
+		//	}
+		//	else
+		//	{
+		//		System.out.println("Winner is: " + robots.peek().name);
+		//		System.exit(0);
+		//	}
 	}
 
 	/**
