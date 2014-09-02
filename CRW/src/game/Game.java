@@ -1,6 +1,8 @@
 package game;
 
 import java.awt.Canvas;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -154,6 +156,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	 */
 	private void initEntities() throws FileNotFoundException {
 		// create the robots
+		//TODO: change robot graphics to odd pixel values
 		BufferedImage testy = null;
 		try {
 			testy = ImageIO.read(new File("resources/testy.png"));
@@ -166,6 +169,12 @@ public class Game extends Canvas implements GameWindowCallback {
 		} catch (IOException e) {
 		}
 		
+		BufferedImage gun = null;
+		try {
+			gun = ImageIO.read(new File("resources/gun.png"));
+		} catch (IOException e) {
+		}
+		
 		//import the programs
 		Program challengerProgram = new Program(new File("robots/challenger.txt"));
 		Program newguyProgram = new Program(new File("robots/newguy.txt"));
@@ -173,25 +182,36 @@ public class Game extends Canvas implements GameWindowCallback {
 		Program followerProgram = new Program(new File("robots/follower.txt"));
 
 		//add robots to the game
-//		addRobot(new Robot("Bounce1", bounceProgram, challenger));
-//		addRobot(new Robot("Bounce2", bounceProgram, challenger));
-//		addRobot(new Robot("Bounce3", bounceProgram, challenger));
-//		addRobot(new Robot("Bounce4", bounceProgram, challenger));
-//
-//		addRobot(new Robot("Challenger1", challengerProgram, challenger));
-//		addRobot(new Robot("Challenger2", challengerProgram, challenger));
-//		addRobot(new Robot("Challenger3", challengerProgram, challenger));
-//		addRobot(new Robot("Challenger4", challengerProgram, challenger));
+		addRobot(new Robot("Bounce1", bounceProgram, challenger,gun));
+		addRobot(new Robot("Bounce2", bounceProgram, challenger,gun));
+		addRobot(new Robot("Bounce3", bounceProgram, challenger,gun));
+		addRobot(new Robot("Bounce4", bounceProgram, challenger,gun));
+
+		addRobot(new Robot("Challenger1", challengerProgram, challenger,gun));
+		addRobot(new Robot("Challenger2", challengerProgram, challenger,gun));
+		addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
+		addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
 		
-		addRobot(new Robot("Follower1", followerProgram, challenger));
-		addRobot(new Robot("Follower2", followerProgram, challenger));
-		addRobot(new Robot("Follower3", followerProgram, challenger));
-		addRobot(new Robot("Follower4", followerProgram, challenger));
+		addRobot(new Robot("Follower1", followerProgram, challenger,gun));
+		addRobot(new Robot("Follower2", followerProgram, challenger,gun));
+		addRobot(new Robot("Follower3", followerProgram, challenger,gun));
+		addRobot(new Robot("Follower4", followerProgram, challenger,gun));
 	}
 
 	public static boolean isVariable(String instruction) {
 
 		return varHash.contains(instruction);
+	}
+	
+	public static boolean isComment(String instruction) {
+		if (instruction != null && instruction.length() > 2)
+		{
+			if (instruction.startsWith("//"))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -235,6 +255,14 @@ public class Game extends Canvas implements GameWindowCallback {
 			e.printStackTrace();
 		}
 		time++;
+		if (time % 50 == 0)
+		{
+			System.out.println(time/50);
+			for(Robot robotScore: robots)
+			{
+				System.out.println(robotScore.name+ ": "+robotScore.hull);
+			}
+		}
 
 		//update robots
 		for(Robot robot: robots)
@@ -255,9 +283,13 @@ public class Game extends Canvas implements GameWindowCallback {
 				//TODO: get a graphic for this
 				double aimRadians = robot.aim * (Math.PI + Math.PI) / 360;
 
-				int px = (int) (robot.x + Math.sin(aimRadians) * (robot.radius+7));
-				int py = (int) (robot.y - Math.cos(aimRadians) * (robot.radius+7));
-				window.getDrawGraphics().drawImage(robot.image, px, py, null);
+				int px = (int) (robot.x+2 +(robot.radius/2));
+				int py = (int) (robot.y+2 + (robot.radius/2));
+				AffineTransform rotate = new AffineTransform();
+				rotate.rotate(aimRadians+Math.PI);
+				window.getDrawGraphics().translate(px, py);
+				window.getDrawGraphics().drawImage(robot.gun, rotate, null);
+				window.getDrawGraphics().translate(-px, -py);
 
 			}
 		}

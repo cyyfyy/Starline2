@@ -7,6 +7,7 @@ public class Robot {
 	String name;
 	Program program;
 	Image image;
+	Image gun;
 
 
 	int hull;
@@ -44,7 +45,7 @@ public class Robot {
 	Stack<Object> stack;
 	String bulletType;
 
-	Robot(String n,Program p, Image i)
+	Robot(String n,Program p, Image i, Image g)
 	{
 		hull = 100;
 		radius = 8;
@@ -58,6 +59,7 @@ public class Robot {
 		name = n;
 		program = p;
 		image = i;
+		gun = g;
 		processorSpeed = 10;
 		chronons = 0;
 		maxEnergy = 150;
@@ -69,18 +71,18 @@ public class Robot {
 		ptr = 0;
 		last_ptr = 0;
 
-		aim = 90;
+		aim = 0;
 		scan = 0;
 		look = 0;
 		energy = maxEnergy;
 		shield = 0;
 		stasis = 0;
-		 x = (int)(Math.random()*1000);
-		 y = (int)(Math.random()*1000);
-		 vx = 0;
-		 vy = 0;
-		 interrupts = new InterQueue();
-		 stack = new Stack<Object>();
+		x = (int)(Math.random()*1000);
+		y = (int)(Math.random()*1000);
+		vx = 0;
+		vy = 0;
+		interrupts = new InterQueue();
+		stack = new Stack<Object>();
 		bulletType = "NORMAL";
 	}
 
@@ -93,8 +95,6 @@ public class Robot {
 		return false;
 	}
 
-
-
 	/**
 	 * Robot processes its instructions
 	 */
@@ -103,7 +103,7 @@ public class Robot {
 		//	System.out.println("------ " +  chronons + " ------");
 
 		if ( stasis > 0) {
-			 stasis--;
+			stasis--;
 
 
 			System.out.println("In stasis for " +  stasis + " more chronons");
@@ -118,11 +118,11 @@ public class Robot {
 
 		if ( touchingWall) 
 		{
-			 takeDamage(5);
+			takeDamage(5);
 		}
 		if ( colliding) 
 		{
-			 takeDamage(1);
+			takeDamage(1);
 		}
 
 		if (hull <= 0)
@@ -161,41 +161,41 @@ public class Robot {
 			}
 
 			if ( hull <  interrupts.getParam("DAMAGE"))
-				 interrupts.add("DAMAGE");
+				interrupts.add("DAMAGE");
 			if ( shield <  interrupts.getParam("SHIELD"))
-				 interrupts.add("SHIELD");
+				interrupts.add("SHIELD");
 
 			if ( y <  interrupts.getParam("TOP")) {
 				if (! wasAtTop) {
-					 interrupts.add("TOP");
-					 wasAtTop = true;
+					interrupts.add("TOP");
+					wasAtTop = true;
 				}
 			} else {
-				 wasAtTop = false;
+				wasAtTop = false;
 			}
 			if ( y >  interrupts.getParam("BOTTOM")) {
 				if (! wasAtBottom) {
-					 interrupts.add("BOTTOM");
-					 wasAtBottom = true;
+					interrupts.add("BOTTOM");
+					wasAtBottom = true;
 				}
 			} else {
-				 wasAtBottom = false;
+				wasAtBottom = false;
 			}
 			if ( x <  interrupts.getParam("LEFT")) {
 				if (! wasAtLeft) {
-					 interrupts.add("LEFT");
-					 wasAtLeft = true;
+					interrupts.add("LEFT");
+					wasAtLeft = true;
 				}
 			} else {
-				 wasAtLeft = false;
+				wasAtLeft = false;
 			}
 			if ( x >  interrupts.getParam("RIGHT")) {
 				if (! wasAtRight) {
-					 interrupts.add("RIGHT");
-					 wasAtRight = true;
+					interrupts.add("RIGHT");
+					wasAtRight = true;
 				}
 			} else {
-				 wasAtRight = false;
+				wasAtRight = false;
 			}
 
 			checkRadarInterrupt();
@@ -206,7 +206,7 @@ public class Robot {
 			// TODO: ROBOTS interrupt.
 
 			if ( chronons >=  interrupts.getParam("CHRONON")) {
-				 interrupts.add("CHRONON");
+				interrupts.add("CHRONON");
 			}
 		}
 
@@ -219,7 +219,7 @@ public class Robot {
 				if (interrupts.enabled && interrupts.hasNext()) {
 					interrupts.enabled = false;
 					String next = interrupts.next();
-					System.out.println("Executing interrupt " + next);
+					//System.out.println("Executing interrupt " + next);
 					opCall(interrupts.getPtr(next));
 				}
 				// Some instructions have no cost, like DEBUG, thus they return 0.
@@ -229,17 +229,17 @@ public class Robot {
 				String instruction = program.instructions[last_ptr];
 				String message = name + " error on line " + line + ", at " + instruction;
 				System.out.println(message + "\n\n" + e);
-				 colliding = false;
+				colliding = false;
 				i-=1;
 			}
 		}
 
 		int r =  radius;
-		 x = Math.max(r, Math.min( arena.width - r,  x +  vx));
-		 y = Math.max(r, Math.min( arena.height - r,  y +  vy));
+		x = Math.max(r, Math.min( arena.width - r,  x +  vx));
+		y = Math.max(r, Math.min( arena.height - r,  y +  vy));
 
-		 wasColliding =  colliding;
-		 wasOnWall =  touchingWall;
+		wasColliding =  colliding;
+		wasOnWall =  touchingWall;
 	}
 
 	private int opCall(int address) 
@@ -261,7 +261,10 @@ public class Robot {
 		last_ptr = ptr;
 		ptr++;
 
-		if (Game.isVariable(instruction)) {
+		if (Game.isComment(instruction)){
+			return 0;
+		}
+		else if (Game.isVariable(instruction)) {
 			stack.push(instruction);
 			return 1;
 		} else if (Literal.isLiteral(instruction)) {
@@ -273,7 +276,7 @@ public class Robot {
 		}
 		return 1;
 	}
-	
+
 	private int handleOperation(String op) {
 		//Stack<Object> s =  stack;
 
@@ -478,19 +481,12 @@ public class Robot {
 		}
 	}
 
-
-
 	private int opJump(int popNumber) {
 		int address = popNumber;
 		//  trace('Go to',  program.address_to_label[address]);
-		 ptr = address;
+		ptr = address;
 		return 1;
 	}
-
-
-
-
-
 
 	private String popVariable() {
 		if ( stack.size() == 0) {
@@ -532,7 +528,7 @@ public class Robot {
 		case "ENERGY":
 			return;
 		case "FIRE":
-			 shoot( bulletType, value);
+			shoot( bulletType, value);
 			return;
 			//		case "FRIEND":
 			//			throw new Error("Teamplay not yet implemented");
@@ -570,10 +566,10 @@ public class Robot {
 			//			 shoot(name, value);
 			//			return;
 		case "MOVEX":
-			 teleport("x", value);
+			teleport("x", value);
 			return;
 		case "MOVEY":
-			 teleport("y", value);
+			teleport("y", value);
 			return;
 			//		case "NUKE":
 			//			 shoot(name, value);
@@ -596,16 +592,16 @@ public class Robot {
 			if ( shield < value) {
 				int cost = value -  shield;
 				if ( energy < cost) {
-					 shield += ( energy);
-					 energy = 0;
+					shield += ( energy);
+					energy = 0;
 				} else {
-					 shield = value;
-					 energy -= cost;
+					shield = value;
+					energy -= cost;
 				}
 			} else if ( shield > value) {
 				int gain =  shield - value;
-				 shield = value;
-				 energy = Math.min( energy + gain,  maxEnergy);
+				shield = value;
+				energy = Math.min( energy + gain,  maxEnergy);
 			}
 			return;
 			//	      case "SIGNAL":
@@ -622,10 +618,10 @@ public class Robot {
 			//	      case "SND9":
 			//	        return;
 		case "SPEEDX":
-			 setSpeed("x", value);
+			setSpeed("x", value);
 			return;
 		case "SPEEDY":
-			 setSpeed("y", value);
+			setSpeed("y", value);
 			return;
 			//	      case "STUNNER":
 			//	         shoot(name, value);
@@ -760,28 +756,23 @@ public class Robot {
 
 			//   throw new Error("Unknown variable or label: " " + name + " ");
 		}
-	return Integer.MIN_VALUE; //something is wrong
+		return Integer.MIN_VALUE; //something is wrong
 	}
 
 	private void teleport(String axis, int energy)
 	{
 		int distance = (int)(energy / 2);
-		 energy -= (int)(energy);
+		energy -= (int)(energy);
 		int r =  radius;
 		switch (axis) {
 		case "x":
-			 x = Math.max(r, Math.min( arena.width - r,  x + distance));
+			x = Math.max(r, Math.min( arena.width - r,  x + distance));
 			break;
 		case "y":
-			 y = Math.max(r, Math.min( arena.height - r,  y + distance));
+			y = Math.max(r, Math.min( arena.height - r,  y + distance));
 		}
 
 	}
-
-
-
-
-
 
 	private void setSpeed(String axis, int speedParam) 
 	{
@@ -809,23 +800,11 @@ public class Robot {
 		}
 	}
 
-
-
-
-
-
 	private void shoot(String type, int amount) {
 		amount = Math.min(amount,  maxEnergy);
-		 arena.shoot(this, type, amount);
-		 energy -= amount;
+		arena.shoot(this, type, amount);
+		energy -= amount;
 	}
-
-
-
-
-
-
-
 
 	private int popNumber() {
 		if ( stack.size() == 0) {
@@ -844,27 +823,10 @@ public class Robot {
 		return 0;
 	}
 
-	//	private void pushIntstructions(String i)
-	//	{
-	//	 program.pushInstructions(i);
-	//     program.pushLN(program.lineNumber);
-	//     program.address++;
-	//	}
-
-
-
-
-
-
 	private int opApply1(String op) {
 		return 1;
 
 	}
-
-
-
-
-
 
 	private int opApply2(String op) {
 		switch (op) {
@@ -882,11 +844,6 @@ public class Robot {
 		}
 		return 1;
 	}
-
-
-
-
-
 
 	protected boolean isTouching(Robot other)
 	{
@@ -951,7 +908,7 @@ public class Robot {
 		double radar = arena.doRadar(this);
 		if (radar != 0 && radar <= interrupts.getParam("RADAR"))
 		{
-			 interrupts.add("RADAR");
+			interrupts.add("RADAR");
 		}
 	}
 
@@ -960,7 +917,7 @@ public class Robot {
 		if (range != 0 && range <= interrupts.getParam("RANGE"))
 		{
 			//System.out.println(range);
-			 interrupts.add("RANGE");
+			interrupts.add("RANGE");
 		}
 	}
 }
