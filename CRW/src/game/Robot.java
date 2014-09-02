@@ -261,17 +261,35 @@ public class Robot {
 		last_ptr = ptr;
 		ptr++;
 
-		if (Game.isComment(instruction)){
+		if (Game.isComment(instruction))
+		{
 			return 0;
 		}
-		else if (Game.isVariable(instruction)) {
+		else if (Game.isRegister(instruction))
+		{
+			if(program.registers.containsKey(instruction.substring(2)))
+			{
+				stack.push(program.registers.get(instruction.substring(2)));
+			}
+			return 0;
+		}
+		else if (Game.isHandler(instruction))
+		{
+			return 0;
+		}
+		else if (Game.isVariable(instruction)) 
+		{
 			stack.push(instruction);
 			return 1;
-		} else if (Literal.isLiteral(instruction)) {
+		} 
+		else if (Literal.isLiteral(instruction))
+		{
 			int value = Integer.parseInt(instruction);
 			stack.push(value);
 			return 1;
-		} else if (Operator.isOperator(instruction)) { //always true for now TODO: fix this
+		} 
+		else if (Operator.isOperator(instruction)) 
+		{ //always true for now TODO: fix this
 			return  handleOperation(instruction);
 		}
 		return 1;

@@ -168,15 +168,15 @@ public class Game extends Canvas implements GameWindowCallback {
 			challenger = ImageIO.read(new File("resources/challenger.png"));
 		} catch (IOException e) {
 		}
-		
+
 		BufferedImage gun = null;
 		try {
 			gun = ImageIO.read(new File("resources/gun.png"));
 		} catch (IOException e) {
 		}
-		
+
 		//import the programs
-		Program challengerProgram = new Program(new File("robots/challenger.txt"));
+		Program challengerProgram = new Program(new File("robots/bounceRegisters.txt"));
 		Program newguyProgram = new Program(new File("robots/newguy.txt"));
 		Program bounceProgram = new Program(new File("robots/bounce.txt"));
 		Program followerProgram = new Program(new File("robots/follower.txt"));
@@ -191,7 +191,7 @@ public class Game extends Canvas implements GameWindowCallback {
 		addRobot(new Robot("Challenger2", challengerProgram, challenger,gun));
 		addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
 		addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
-		
+
 		addRobot(new Robot("Follower1", followerProgram, challenger,gun));
 		addRobot(new Robot("Follower2", followerProgram, challenger,gun));
 		addRobot(new Robot("Follower3", followerProgram, challenger,gun));
@@ -202,11 +202,33 @@ public class Game extends Canvas implements GameWindowCallback {
 
 		return varHash.contains(instruction);
 	}
-	
+
 	public static boolean isComment(String instruction) {
 		if (instruction != null && instruction.length() > 2)
 		{
 			if (instruction.startsWith("//"))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isRegister(String instruction) {
+		if (instruction != null && instruction.length() > 2)
+		{
+			if (instruction.startsWith("##"))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isHandler(String instruction) {
+		if (instruction != null && instruction.length() > 2)
+		{
+			if (instruction.startsWith("@@"))
 			{
 				return true;
 			}
@@ -350,8 +372,8 @@ public class Game extends Canvas implements GameWindowCallback {
 				a.colliding = false;
 			}
 		}
-//TODO: update scoreboard
-		
+		//TODO: update scoreboard
+
 		//remove projectiles and robots
 		Object[] pro = projectiles.toArray();
 		for(Object projectile: pro)

@@ -2,6 +2,7 @@ package game;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -11,10 +12,11 @@ public class Program {
 	int MAX_LENGTH = 400;
 
 	String[] instructions;
-	int[] lineNumbers;
+	Hashtable<String,Integer> registers = new Hashtable<String,Integer>();
+	//int[] lineNumbers;
 	public int address = 0;
 	public int lineNumber = 0;
-	String currentLine;
+	String currentInstruction;
 
 	public int numberOfInstructions = 0;
 
@@ -22,19 +24,24 @@ public class Program {
 	public Program(File code) throws FileNotFoundException
 	{
 		instructions = new String[MAX_LENGTH];
-		lineNumbers = new int[MAX_LENGTH];
+		registers = new Hashtable<String,Integer>();
+		//lineNumbers = new int[MAX_LENGTH];
 		Scanner io = new Scanner(code);
 		while (io.hasNext())
 		{
-			currentLine = io.next();
-			pushInstructions(currentLine);
+			currentInstruction = io.next();
+			pushInstructions(currentInstruction);
+			if (currentInstruction.startsWith("@@"))
+			{
+				pushRegister(currentInstruction);
+			}
 		}
 		io.close();
 	}
 
-	public int[] getLineNumbers() {
-		return lineNumbers;
-	}
+//	public int[] getLineNumbers() {
+//		return lineNumbers;
+//	}
 
 	public void pushInstructions(String i)
 	{
@@ -43,9 +50,10 @@ public class Program {
 		address++;
 	}
 
-	public void pushLN(int i)
+	public void pushRegister(String ci)
 	{
-		lineNumbers[lineNumber] = i;
+		String register = ci.substring(2);
+		registers.put(register, address-1);
 		lineNumber++;
 	}
 
