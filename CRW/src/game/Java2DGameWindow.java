@@ -170,7 +170,7 @@ public class Java2DGameWindow extends Canvas {
 			// surface and blank it out
 
 			g = (Graphics2D) strategy.getDrawGraphics();
-			g.setColor(Color.black);
+			g.setColor(Color.white);
 			g.fillRect(0,0,1000,1000);
 			
 			if (callback != null) {
