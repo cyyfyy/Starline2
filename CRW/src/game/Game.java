@@ -192,10 +192,10 @@ public class Game extends Canvas implements GameWindowCallback {
 		addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
 		addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
 
-		addRobot(new Robot("Follower1", followerProgram, challenger,gun));
-		addRobot(new Robot("Follower2", followerProgram, challenger,gun));
-		addRobot(new Robot("Follower3", followerProgram, challenger,gun));
-		addRobot(new Robot("Follower4", followerProgram, challenger,gun));
+		addRobot(new Robot("Follower1", followerProgram, testy,gun));
+		addRobot(new Robot("Follower2", followerProgram, testy,gun));
+		addRobot(new Robot("Follower3", followerProgram, testy,gun));
+		addRobot(new Robot("Follower4", followerProgram, testy,gun));
 	}
 
 	public static boolean isVariable(String instruction) {
