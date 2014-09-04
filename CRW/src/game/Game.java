@@ -177,25 +177,25 @@ public class Game extends Canvas implements GameWindowCallback {
 
 		//import the programs
 		Program challengerProgram = new Program(new File("robots/bounceRegisters.txt"));
-		Program newguyProgram = new Program(new File("robots/newguy.txt"));
+		//Program newguyProgram = new Program(new File("robots/newguy.txt"));
 		Program bounceProgram = new Program(new File("robots/bounce.txt"));
-		Program followerProgram = new Program(new File("robots/follower.txt"));
+		//Program followerProgram = new Program(new File("robots/follower.txt"));
 
 		//add robots to the game
 		addRobot(new Robot("Bounce1", bounceProgram, challenger,gun));
-		addRobot(new Robot("Bounce2", bounceProgram, challenger,gun));
-		addRobot(new Robot("Bounce3", bounceProgram, challenger,gun));
-		addRobot(new Robot("Bounce4", bounceProgram, challenger,gun));
+		//addRobot(new Robot("Bounce2", bounceProgram, challenger,gun));
+		//addRobot(new Robot("Bounce3", bounceProgram, challenger,gun));
+		//addRobot(new Robot("Bounce4", bounceProgram, challenger,gun));
 
 		addRobot(new Robot("Challenger1", challengerProgram, challenger,gun));
-		addRobot(new Robot("Challenger2", challengerProgram, challenger,gun));
-		addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
-		addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
+		//addRobot(new Robot("Challenger2", challengerProgram, challenger,gun));
+		//addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
+		//addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
 
-		addRobot(new Robot("Follower1", followerProgram, testy,gun));
-		addRobot(new Robot("Follower2", followerProgram, testy,gun));
-		addRobot(new Robot("Follower3", followerProgram, testy,gun));
-		addRobot(new Robot("Follower4", followerProgram, testy,gun));
+//		addRobot(new Robot("Follower1", followerProgram, testy,gun));
+//		addRobot(new Robot("Follower2", followerProgram, testy,gun));
+//		addRobot(new Robot("Follower3", followerProgram, testy,gun));
+//		addRobot(new Robot("Follower4", followerProgram, testy,gun));
 	}
 
 	public static boolean isVariable(String instruction) {
