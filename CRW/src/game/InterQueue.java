@@ -1,7 +1,6 @@
 package game;
 
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 public class InterQueue {

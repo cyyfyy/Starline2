@@ -3,8 +3,6 @@ package game;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
 public class Program {
