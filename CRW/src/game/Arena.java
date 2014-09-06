@@ -145,7 +145,7 @@ public class Arena {
 
 	public double doDoppler(Robot robot){
 		int direction = fix360(robot.aim + robot.look);
-		Projectile nearest = findNearestProjectile(robot, direction);
+		Robot nearest = findNearestRobot(robot, direction);
 		if (nearest == null)
 		{
 			return 0;

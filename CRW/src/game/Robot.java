@@ -7,8 +7,7 @@ public class Robot {
 	String name;
 	Program program;
 	Image image;
-	Image gun;
-
+	Image gunImage;
 
 	int hull;
 	int x;
@@ -59,7 +58,7 @@ public class Robot {
 		name = n;
 		program = p;
 		image = i;
-		gun = g;
+		gunImage = g;
 		processorSpeed = 10;
 		chronons = 0;
 		maxEnergy = 150;
@@ -233,7 +232,6 @@ public class Robot {
 				i-=1;
 			}
 		}
-
 		int r =  radius;
 		x = Math.max(r, Math.min( arena.width - r,  x +  vx));
 		y = Math.max(r, Math.min( arena.height - r,  y +  vy));
@@ -329,22 +327,22 @@ public class Robot {
 		//		case "NOT": return opApply1(op);
 		//		case "SQRT": return opApply1(op);
 		//
-		//		case "SIN": case "SINE": return opTrig(op);
-		//		case "COS": case "COSSINE": return opTrig(op);
-		//		case "TAN": case "TANGENT": return opTrig(op);
-		//		case "ARCSIN": return opTrig(op);
-		//		case "ARCCOS": return opTrig(op);
-		//		case "ARCTAN":
-		//			int i =  popNumber();
-		//			int j =  popNumber();
-		//			double result = Math.atan2(-i, j);  // Flip Y coord.
-		//			// Robowar"s Engine/Arena.c does this, so I will:
-		//			 push((int)(450.5 - Arena.rad2deg(result)) % 360);
-		//			return 1;
-		//			//		case "DIST":
-		//			//			int dy =  y -  pop_number();
-		//			//			int dx =  x -  pop_number();
-		//			//			return Math.sqrt( (dx * dx) + (dy * dy) );
+		case "SIN": return opTrig(op);
+		case "COS": return opTrig(op);
+		case "TAN": return opTrig(op);
+		case "ARCSIN": return opTrig(op);
+		case "ARCCOS": return opTrig(op);
+		case "ARCTAN":
+			int i =  popNumber();
+			int j =  popNumber();
+			double result = Math.atan2(-i, j);  // Flip Y coord.
+			// Robowar's Engine/Arena.c does this, so I will:
+			stack.push((int)(450.5 - Arena.rad2deg(result)) % 360);
+			return 1;
+			//			//		case "DIST":
+			//			//			int dy =  y -  pop_number();
+			//			//			int dx =  x -  pop_number();
+			//			//			return Math.sqrt( (dx * dx) + (dy * dy) );
 
 		case "STORE":
 		case "STO":
@@ -539,8 +537,8 @@ public class Robot {
 			//		case "CHRONON":
 			//		case "COLLISION":
 			//		case "DAMAGE":
-			//		case "DOPPLER":
-			//			return;
+		case "DOPPLER":
+			return;
 			//		case "DRONE":
 			//			throw new Error("Drones are not supported as of RoboWar 2.4");
 		case "ENERGY":
@@ -795,14 +793,14 @@ public class Robot {
 	private void setSpeed(String axis, int speedParam) 
 	{
 		int value = speedParam;
-		if (Math.abs(value) > 10)//set max speed
+		if (Math.abs(value) > 5)//set max speed
 		{
 			if(value < 0){
-				value = -10;
+				value = -5;
 			}
 			else
 			{
-				value = 10;
+				value = 5;
 			}
 		}
 		switch (axis) {
@@ -837,14 +835,22 @@ public class Robot {
 	}
 
 	private int opTrig(String op) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+		switch (op) {
+		case "SIN": stack.push((int)(popNumber() * Math.sin(popNumber()))); return 1;
+		case "COS": return 1;//TODO
+		case "TAN": return 1;//TODO
+		case "ARCSIN": return 0;//TODO
+		case "ARCCOS": return 0;//TODO
+		//case "ARCTAN":
 
-	private int opApply1(String op) {
+		}
 		return 1;
-
 	}
+
+	//	private int opApply1(String op) {
+	//		return 1;
+	//
+	//	}
 
 	private int opApply2(String op) {
 		switch (op) {

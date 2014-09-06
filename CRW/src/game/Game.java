@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import java.util.Stack;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import projectiles.ExplosiveBullet;
 import projectiles.Hellbore;
@@ -110,6 +111,10 @@ public class Game extends Canvas implements GameWindowCallback {
 			"X",
 			"Y"
 	};
+	
+	BufferedImage ooe = null;
+	BufferedImage shield = null;
+
 
 	static Hashtable<Integer,String> varHash = new Hashtable<Integer,String>();
 
@@ -156,45 +161,90 @@ public class Game extends Canvas implements GameWindowCallback {
 	private void initEntities() throws FileNotFoundException {
 		// create the robots
 		//TODO: change robot graphics to odd pixel values
-		BufferedImage testy = null;
+		
+		BufferedImage tom = null;
 		try {
-			testy = ImageIO.read(new File("resources/testy.png"));
+			tom = ImageIO.read(new File("src/game/tom.png"));
 		} catch (IOException e) {
 		}
 
 		BufferedImage challenger = null;
 		try {
-			challenger = ImageIO.read(new File("resources/challenger.png"));
+			challenger = ImageIO.read(new File("src/game/doge.png"));
+		} catch (IOException e) {
+		}
+		
+		BufferedImage avery = null;
+		try {
+			avery = ImageIO.read(new File("src/game/avery.jpg"));
+		} catch (IOException e) {
+		}
+		
+		BufferedImage mikey = null;
+		try {
+			mikey = ImageIO.read(new File("src/game/mikey.jpg"));
+		} catch (IOException e) {
+		}
+		
+		BufferedImage kai = null;
+		try {
+			kai = ImageIO.read(new File("src/game/kai.jpg"));
 		} catch (IOException e) {
 		}
 
 		BufferedImage gun = null;
 		try {
-			gun = ImageIO.read(new File("resources/gun.png"));
+			gun = ImageIO.read(new File("src/game/gun.png"));
+		} catch (IOException e) {
+		}
+		
+		try {
+			ooe = ImageIO.read(new File("src/game/ooe.png"));
+		} catch (IOException e) {
+		}
+		
+		try {
+			shield = ImageIO.read(new File("src/game/shield.png"));
 		} catch (IOException e) {
 		}
 
 		//import the programs
-		Program challengerProgram = new Program(new File("robots/bounceRegisters.txt"));
-		//Program newguyProgram = new Program(new File("robots/newguy.txt"));
-		Program bounceProgram = new Program(new File("robots/bounce.txt"));
-		//Program followerProgram = new Program(new File("robots/follower.txt"));
+//		Program challengerProgram = new Program(new File("bounceRegisters.txt"));
+		//Program newguyProgram = new Program(new File("newguy.txt"));
+		Program bounceProgram = new Program(Program.createProgram("bounceRegisters.txt"));
+		Program followerProgram = new Program(Program.createProgram("gunturret.txt"));
 
 		//add robots to the game
-		addRobot(new Robot("Bounce1", bounceProgram, challenger,gun));
-		//addRobot(new Robot("Bounce2", bounceProgram, challenger,gun));
-		//addRobot(new Robot("Bounce3", bounceProgram, challenger,gun));
-		//addRobot(new Robot("Bounce4", bounceProgram, challenger,gun));
+		addRobot(new Robot("KAI", bounceProgram, kai,gun));
+		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
+		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
+		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
+//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
+//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
+//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
+//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
+//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
+//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
+//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
+//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
+//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
+//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
+//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
+//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
 
-		addRobot(new Robot("Challenger1", challengerProgram, challenger,gun));
+//		addRobot(new Robot("Challenger1", challengerProgram, challenger,gun));
 		//addRobot(new Robot("Challenger2", challengerProgram, challenger,gun));
 		//addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
 		//addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
 
-//		addRobot(new Robot("Follower1", followerProgram, testy,gun));
-//		addRobot(new Robot("Follower2", followerProgram, testy,gun));
-//		addRobot(new Robot("Follower3", followerProgram, testy,gun));
-//		addRobot(new Robot("Follower4", followerProgram, testy,gun));
+		//addRobot(new Robot("Follower1", followerProgram, testy,gun));
+		//addRobot(new Robot("Follower2", followerProgram, testy,gun));
+		//addRobot(new Robot("Follower3", followerProgram, testy,gun));
+		//addRobot(new Robot("Follower4", followerProgram, testy,gun));
 	}
 
 	public static boolean isVariable(String instruction) {
@@ -251,7 +301,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	{
 		BufferedImage ref = null;
 		try {
-			ref = ImageIO.read(new File("resources/bullet.png"));
+			ref = ImageIO.read(new File("src/game/bullet.png"));
 		} catch (IOException e) {
 		}
 		switch(type)
@@ -309,8 +359,17 @@ public class Game extends Canvas implements GameWindowCallback {
 				AffineTransform rotate = new AffineTransform();
 				rotate.rotate(aimRadians+Math.PI);
 				window.getDrawGraphics().translate(px, py);
-				window.getDrawGraphics().drawImage(robot.gun, rotate, null);
+				window.getDrawGraphics().drawImage(robot.gunImage, rotate, null);
 				window.getDrawGraphics().translate(-px, -py);
+				
+				if (robot.shield > 0)
+				{
+					window.getDrawGraphics().drawImage(shield, robot.x-1, robot.y-1, null);
+				}
+				if (robot.energy <= 0)//draw over shield if ooe
+				{
+					window.getDrawGraphics().drawImage(ooe, robot.x-1, robot.y-1, null);
+				}
 
 			}
 		}
@@ -400,7 +459,16 @@ public class Game extends Canvas implements GameWindowCallback {
 
 
 
-
+	 /** Returns an ImageIcon, or null if the path was invalid. */
+    protected static ImageIcon createImageIcon(String path) {
+        java.net.URL imgURL = Game.class.getResource(path);
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+        	System.err.println("Couldn't find file: " + path);
+            return null;
+        }
+    }
 
 
 	/**
