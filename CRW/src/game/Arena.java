@@ -52,7 +52,13 @@ public class Arena {
 
 		game.projectiles.push(p);
 	}
-
+/**
+ * Returns 0 in no robot is in sights
+ * 
+ * @param observer
+ * @param direction
+ * @return range to nearest robot in sights
+ */
 
 	protected Robot findNearestRobot(Robot observer, int direction) {
 		// A port of RoboWar 4.5.2's Engine/Projectile.c distance()
@@ -179,9 +185,9 @@ public class Arena {
 						doppler = 0;
 					}
 					else {
-						a = (a-c); /* a = rx */
-						b = (b-d); /* b = ry */
-						c = (a*target.vx + b*target.vy); /* c = r¥v */
+						a = (a-c); /* a = rx */ //x difference
+						b = (b-d); /* b = ry */ //y difference
+						c = (a*target.vx + b*target.vy); /* c = r¥v */ //xdiff*xspeed + ydiff*yspeed
 						t = (target.vx*target.vx+ target.vy*target.vy) - (c*c) / (a*a+b*b);
 						tmp = Math.sqrt(t);
 						if (tmp-(int)(tmp) > 0.5) tmp+=1.0;
@@ -192,6 +198,12 @@ public class Arena {
 		}
 
 		return dist == 0 ? 0 : doppler;
+	}
+	public double jakeDoppler(Robot robot)
+	{
+		
+		return 0;
+		
 	}
 
 	public int activeRobots() {

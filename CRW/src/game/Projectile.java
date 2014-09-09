@@ -28,7 +28,7 @@ public abstract class Projectile {
 		this.x = 0;
 		this.y = 0;
 		this.radius = 2;
-		this.speed = 20;
+		this.speed = 12;
 		this.speedX = 0; // Set by caller.
 		this.speedY = 0; // Set by caller.
 		this.image = img;
