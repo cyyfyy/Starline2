@@ -1,5 +1,6 @@
 package game;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -10,7 +11,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
+import java.io.File;
+import java.io.FileNotFoundException;
 
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -22,19 +27,24 @@ import javax.swing.KeyStroke;
  * Uses Java 2D rendering to produce the scene.
  */
 @SuppressWarnings("serial")
-public class Java2DGameWindow extends Canvas implements ActionListener {
+public class Java2DGameWindow extends Canvas {
 	/** The strategy that allows us to use accelerate page flipping */
 	private BufferStrategy strategy;
 	/** True if the game is currently "running", i.e. the game loop is looping */
-	private boolean gameRunning = true;
-
+	boolean gameRunning = true;
+	boolean gameStarted = false;
 	/** The frame in which we'll display our canvas */
 	protected JFrame frame;
 
 	/** The menu bar for options */
 	private JMenuBar menuBar;
 	private JMenu menu;
-	protected JMenuItem menuItem;
+	private JMenuItem menuItem;
+
+	JFileChooser fc;
+	JButton openButton;
+	private JButton saveButton;
+
 
 	/** The width of the display */
 	private int width;
@@ -45,12 +55,107 @@ public class Java2DGameWindow extends Canvas implements ActionListener {
 	/** The current accelerated graphics context */
 	private Graphics2D g;
 
+	File f1;
+	File f2;
+	Program p1;
+	Program p2;
+
 	/**
 	 * Create a new window to render using Java 2D. Note this will
 	 * *not* actually cause the window to be shown.
 	 */
 	public Java2DGameWindow() {
 		frame = new JFrame();
+
+		menuBar = new JMenuBar();
+		//Build the first menu.
+		menu = new JMenu("Options");
+		menu.setMnemonic(KeyEvent.VK_O);
+		menu.getAccessibleContext().setAccessibleDescription(
+				"Options menu");
+		menuBar.add(menu);
+
+		//a group of JMenuItems
+		menuItem = new JMenuItem("Start",
+				KeyEvent.VK_T);
+		//menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
+		menuItem.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_S, ActionEvent.ALT_MASK));
+		menuItem.getAccessibleContext().setAccessibleDescription(
+				"Start the game");
+		menu.add(menuItem);
+
+		frame.setJMenuBar(menuBar);
+
+		menuItem.setActionCommand("start");
+		menuItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				gameStarted = true;
+			}
+
+		});
+		//add a file chooser
+		fc = new JFileChooser();
+
+		openButton = new JButton("Open a File...");
+		openButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				//Handle open button action.
+				if (e.getSource() == openButton) {
+					int returnVal = fc.showOpenDialog(Java2DGameWindow.this);
+
+					if (returnVal == JFileChooser.APPROVE_OPTION) {
+						f1 = fc.getSelectedFile();
+						try {
+							p1 = new Program(Program.createProgram(f1.getAbsolutePath()));
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						//This is where a real application would open the file.
+						System.out.println("Opening: " + f1.getName() + ".");
+					} else {
+						System.out.println("Open command cancelled by user.");
+					}
+
+				}
+			}
+		});
+		//menu.add(openButton);
+
+//		//Create the save button.  We use the image from the JLF
+//		//Graphics Repository (but we extracted it from the jar).
+//		saveButton = new JButton("Save a File...",
+//				createImageIcon("images/Save16.gif"));
+//		saveButton.addActionListener(this);
+//
+//		//For layout purposes, put the buttons in a separate panel
+//		JPanel buttonPanel = new JPanel(); //use FlowLayout
+//		buttonPanel.add(openButton);
+//		buttonPanel.add(saveButton);
+//
+//		//Add the buttons and the log to this panel.
+//		add(buttonPanel, BorderLayout.PAGE_START);
+//		add(logScrollPane, BorderLayout.CENTER);
+
+		////Handle save button action.
+		//} else if (e.getSource() == saveButton) {
+		//int returnVal = fc.showSaveDialog(FileChooserDemo.this);
+		//if (returnVal == JFileChooser.APPROVE_OPTION) {
+		//File file = fc.getSelectedFile();
+		////This is where a real application would save the file.
+		//log.append("Saving: " + file.getName() + "." + newline);
+		//} else {
+		//log.append("Save command cancelled by user." + newline);
+		//}
+		//log.setCaretPosition(log.getDocument().getLength());
+		//}
+		//}
 	}
 
 	/**
@@ -73,7 +178,7 @@ public class Java2DGameWindow extends Canvas implements ActionListener {
 		width = x;
 		height = y;
 	}
-	
+
 	//public JMenuBar
 
 	/**
@@ -81,29 +186,6 @@ public class Java2DGameWindow extends Canvas implements ActionListener {
 	 */
 	public void startRendering() {
 		// get hold the content of the frame and set up the resolution of the game
-
-		menuBar = new JMenuBar();
-		//Build the first menu.
-		menu = new JMenu("Options");
-		menu.setMnemonic(KeyEvent.VK_A);
-		menu.getAccessibleContext().setAccessibleDescription(
-				"Options menu");
-		menuBar.add(menu);
-
-		//a group of JMenuItems
-		menuItem = new JMenuItem("Start",
-				KeyEvent.VK_T);
-		//menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_1, ActionEvent.ALT_MASK));
-		menuItem.getAccessibleContext().setAccessibleDescription(
-				"Start the game");
-		menu.add(menuItem);
-
-		frame.setJMenuBar(menuBar);
-		
-		menuItem.setActionCommand("start");
-		menuItem.addActionListener(this);
 
 		JPanel panel = (JPanel) frame.getContentPane();
 		panel.setPreferredSize(new Dimension(1000,1000));
@@ -163,7 +245,7 @@ public class Java2DGameWindow extends Canvas implements ActionListener {
 
 		// start the game loop
 
-		//gameLoop();
+		preGameLoop();
 	}
 
 	/**
@@ -196,21 +278,36 @@ public class Java2DGameWindow extends Canvas implements ActionListener {
 	Graphics2D getDrawGraphics() {
 		return g;
 	}
-	
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		if(arg0.getActionCommand().equals("start"))
-		{
-			gameLoop();
-		}
-	}
 
 	/**
 	 * Run the main game loop. This method keeps rendering the scene
 	 * and requesting that the callback update its screen.
 	 */
-	private void gameLoop() {
+	private void preGameLoop() {
 		while (gameRunning) {
+			if(gameStarted)
+			{
+				break;
+			}
+			// Get hold of a graphics context for the accelerated 
+
+			// surface and blank it out
+
+			g = (Graphics2D) strategy.getDrawGraphics();
+			g.setColor(Color.white);
+			g.fillRect(0,0,1000,1000);
+
+			// finally, we've completed drawing so clear up the graphics
+			// and flip the buffer over
+
+			g.dispose();
+			strategy.show();
+
+		}
+		gameLoop();
+	}
+	private void gameLoop() {
+		while (gameStarted) {
 			// Get hold of a graphics context for the accelerated 
 
 			// surface and blank it out

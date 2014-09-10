@@ -11,6 +11,7 @@ import java.util.Stack;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 
 import projectiles.ExplosiveBullet;
 import projectiles.Hellbore;
@@ -114,6 +115,9 @@ public class Game extends Canvas implements GameWindowCallback {
 	
 	BufferedImage ooe = null;
 	BufferedImage shield = null;
+	
+	//Robot robot1;
+	//Robot robot2;
 
 
 	static Hashtable<Integer,String> varHash = new Hashtable<Integer,String>();
@@ -151,6 +155,7 @@ public class Game extends Canvas implements GameWindowCallback {
 			varHash.put(i, var);
 			i++;
 		}
+		
 	}
 
 	/**
@@ -211,17 +216,17 @@ public class Game extends Canvas implements GameWindowCallback {
 		//import the programs
 //		Program challengerProgram = new Program(new File("bounceRegisters.txt"));
 		//Program newguyProgram = new Program(new File("newguy.txt"));
-		Program bounceProgram = new Program(Program.createProgram("bounceRegisters.txt"));
-		Program followerProgram = new Program(Program.createProgram("gunturret.txt"));
-
-		//add robots to the game
-		addRobot(new Robot("KAI", bounceProgram, kai,gun));
-		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
-		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
-		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+//		Program bounceProgram = new Program(Program.createProgram("bounceRegisters.txt"));
+//		Program followerProgram = new Program(Program.createProgram("gunturret.txt"));
+//
+//		//add robots to the game
+//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
+//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
+//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
+//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
+//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
 //		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
 //		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
 //		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
@@ -245,6 +250,44 @@ public class Game extends Canvas implements GameWindowCallback {
 		//addRobot(new Robot("Follower2", followerProgram, testy,gun));
 		//addRobot(new Robot("Follower3", followerProgram, testy,gun));
 		//addRobot(new Robot("Follower4", followerProgram, testy,gun));
+		int returnVal = window.fc.showOpenDialog(Game.this);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File f1 = window.fc.getSelectedFile();
+			String path = f1.getPath();
+			path = path.replace("\\", File.separator);
+				try {
+					addRobot(new Robot("R1",new Program(Program.createProgram(path)), challenger, gun));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			//This is where a real application would open the file.
+			System.out.println("Opening file.");
+		} else {
+			System.out.println("Open command cancelled by user.");
+		}
+		
+		int returnVal2 = window.fc.showOpenDialog(Game.this);
+
+		if (returnVal2 == JFileChooser.APPROVE_OPTION) {
+			File f2 = window.fc.getSelectedFile();
+			String path = f2.getPath();
+			path = path.replace("\\", File.separator);
+				try {
+					addRobot(new Robot("R2",new Program(Program.createProgram(path)), tom, gun));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			//This is where a real application would open the file.
+			System.out.println("Opening file.");
+		} else {
+			System.out.println("Open command cancelled by user.");
+		}
+
 	}
 
 	public static boolean isVariable(String instruction) {
