@@ -1,6 +1,5 @@
 package game;
 
-import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -39,11 +38,11 @@ public class Java2DGameWindow extends Canvas {
 	/** The menu bar for options */
 	private JMenuBar menuBar;
 	private JMenu menu;
-	private JMenuItem menuItem;
+	private JButton menuItem;
 
 	JFileChooser fc;
 	JButton openButton;
-	private JButton saveButton;
+	//private JButton saveButton;
 
 
 	/** The width of the display */
@@ -73,17 +72,16 @@ public class Java2DGameWindow extends Canvas {
 		menu.setMnemonic(KeyEvent.VK_O);
 		menu.getAccessibleContext().setAccessibleDescription(
 				"Options menu");
-		menuBar.add(menu);
 
 		//a group of JMenuItems
-		menuItem = new JMenuItem("Start",
-				KeyEvent.VK_T);
+		menuItem = new JButton("Start");
 		//menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
-		menuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, ActionEvent.ALT_MASK));
+		//menuItem.setAccelerator(KeyStroke.getKeyStroke(
+		//		KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		menuItem.getAccessibleContext().setAccessibleDescription(
 				"Start the game");
-		menu.add(menuItem);
+		menuBar.add(menuItem);
+		menuBar.add(menu);
 
 		frame.setJMenuBar(menuBar);
 
@@ -188,7 +186,7 @@ public class Java2DGameWindow extends Canvas {
 		// get hold the content of the frame and set up the resolution of the game
 
 		JPanel panel = (JPanel) frame.getContentPane();
-		panel.setPreferredSize(new Dimension(1000,1000));
+		panel.setPreferredSize(new Dimension(300,300));
 		panel.setLayout(null);
 
 
@@ -295,7 +293,7 @@ public class Java2DGameWindow extends Canvas {
 
 			g = (Graphics2D) strategy.getDrawGraphics();
 			g.setColor(Color.white);
-			g.fillRect(0,0,1000,1000);
+			g.fillRect(0,0,300,300);
 
 			// finally, we've completed drawing so clear up the graphics
 			// and flip the buffer over
@@ -314,7 +312,7 @@ public class Java2DGameWindow extends Canvas {
 
 			g = (Graphics2D) strategy.getDrawGraphics();
 			g.setColor(Color.white);
-			g.fillRect(0,0,1000,1000);
+			g.fillRect(0,0,300,300);
 
 			if (callback != null) {
 				callback.frameRendering();

@@ -44,8 +44,8 @@ public class Arena {
 		int radius = robot.radius + 7;
 
 		Projectile p = Game.createProjectile(type, energy);
-		p.x = (int) (robot.x + Math.sin(aimRadians) * radius);
-		p.y = (int) (robot.y - Math.cos(aimRadians) * radius);
+		p.x = (int) (robot.x + Math.sin(aimRadians) * (radius/2));
+		p.y = (int) (robot.y - Math.cos(aimRadians) * (radius/2));
 		p.energy = energy;
 		p.speedX = (int) (Math.sin(aimRadians) * p.speed);
 		p.speedY = (int) (-Math.cos(aimRadians) * p.speed);

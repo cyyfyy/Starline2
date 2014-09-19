@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class Program {
 
-	int MAX_LENGTH = 400;
+	int MAX_LENGTH = 5000;
 	private static boolean external = false;
 
 	String[] instructions;
@@ -38,6 +38,7 @@ public class Program {
 		while (it.hasNext() && external == false)
 		{
 			currentLine = it.next();
+			currentLine = currentLine.toUpperCase();
 			ArrayList<String> split = split(currentLine);
 			if(split == null)
 			{
@@ -49,7 +50,6 @@ public class Program {
 				currentInstruction = it2.next().trim();
 				if(currentInstruction != " ")
 				{
-					System.out.println(currentInstruction);
 					pushInstructions(currentInstruction);
 					if (currentInstruction.startsWith("@@"))
 					{
@@ -65,7 +65,7 @@ public class Program {
 		while (it.hasNext() && external == true)
 		{
 			currentInstruction = it.next();
-			System.out.println(currentInstruction);
+			currentInstruction = currentInstruction.toUpperCase();
 			pushInstructions(currentInstruction);
 			if (currentInstruction.startsWith("@@"))
 			{

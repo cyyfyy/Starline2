@@ -35,11 +35,11 @@ public class InterQueue {
 		params.put("DAMAGE",150);
 		params.put("SHIELD",25);
 		params.put("TOP",20);
-		params.put("BOTTOM",980);
+		params.put("BOTTOM",280);
 		params.put("LEFT",20);
-		params.put("RIGHT",980);
-		params.put("RADAR",1000);
-		params.put("RANGE",1000);
+		params.put("RIGHT",280);
+		params.put("RADAR",300);
+		params.put("RANGE",300);
 		params.put("CHRONON",0);
 
 		for (String name:INames) {

@@ -2,12 +2,12 @@ package projectiles;
 
 import game.Projectile;
 
-import java.awt.Image;
+import javax.swing.ImageIcon;
 
 public class Mine extends Projectile {
 
-	public Mine(int e, Image image) {
-		super(image);
+	public Mine(int e, ImageIcon ref) {
+		super(ref);
 	}
 
 }

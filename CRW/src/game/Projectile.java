@@ -1,6 +1,6 @@
 package game;
 
-import java.awt.Image;
+import javax.swing.ImageIcon;
 
 public abstract class Projectile {
 
@@ -16,11 +16,11 @@ public abstract class Projectile {
 	protected boolean isEmp;
 	protected boolean isStasis;
 	protected int speed;
-	public Image image;
+	public ImageIcon image;
 	boolean active;
 
 
-	protected Projectile(Image img)
+	protected Projectile(ImageIcon ref)
 	{
 		this.energy = 0;
 		this.isEmp = false;
@@ -31,7 +31,7 @@ public abstract class Projectile {
 		this.speed = 12;
 		this.speedX = 0; // Set by caller.
 		this.speedY = 0; // Set by caller.
-		this.image = img;
+		this.image = ref;
 		this.active = true;
 
 	}

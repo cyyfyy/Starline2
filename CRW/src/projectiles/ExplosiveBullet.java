@@ -1,13 +1,13 @@
 package projectiles;
 
-import java.awt.Image;
-
 import game.Projectile;
+
+import javax.swing.ImageIcon;
 
 public class ExplosiveBullet extends Projectile {
 
-	public ExplosiveBullet(int e, Image image) {
-		super(image);
+	public ExplosiveBullet(int e, ImageIcon ref) {
+		super(ref);
 	}
 
 }

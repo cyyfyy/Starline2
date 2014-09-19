@@ -1,13 +1,13 @@
 package projectiles;
 
-import java.awt.Image;
-
 import game.Projectile;
+
+import javax.swing.ImageIcon;
 
 public class Hellbore extends Projectile {
 
-	public Hellbore(int e, Image image) {
-		super(image);
+	public Hellbore(int e, ImageIcon ref) {
+		super(ref);
 	}
 
 }

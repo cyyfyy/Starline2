@@ -1,13 +1,14 @@
 package game;
 
-import java.awt.Image;
 import java.util.Stack;
+
+import javax.swing.ImageIcon;
 
 public class Robot {
 	String name;
 	Program program;
-	Image image;
-	Image gunImage;
+	ImageIcon image;
+	ImageIcon gunImage;
 
 	int hull;
 	int x;
@@ -39,12 +40,13 @@ public class Robot {
 	boolean wasAtRight;
 	public double scan;
 	int look;
+	
 	int last_ptr;
 	int ptr;
 	Stack<Object> stack;
 	String bulletType;
 
-	Robot(String n,Program p, Image i, Image g)
+	Robot(String n,Program p, ImageIcon tom, ImageIcon g)
 	{
 		hull = 100;
 		radius = 8;
@@ -57,9 +59,9 @@ public class Robot {
 
 		name = n;
 		program = p;
-		image = i;
+		image = tom;
 		gunImage = g;
-		processorSpeed = 10;
+		processorSpeed = 30;
 		chronons = 0;
 		maxEnergy = 150;
 		maxShield = 30;
@@ -76,8 +78,8 @@ public class Robot {
 		energy = maxEnergy;
 		shield = 0;
 		stasis = 0;
-		x = (int)(Math.random()*1000);
-		y = (int)(Math.random()*1000);
+		x = (int)(Math.random()*300);
+		y = (int)(Math.random()*300);
 		vx = 0;
 		vy = 0;
 		interrupts = new InterQueue();
@@ -250,7 +252,9 @@ public class Robot {
 
 	private int stepOne() 
 	{
-		String instruction = program.instructions[ptr];
+		String in = program.instructions[ptr];
+		String instruction = in.toUpperCase();
+
 		if (ptr >= program.numberOfInstructions)
 			throw new Error("Program finished");
 		if (instruction == null)
@@ -295,7 +299,7 @@ public class Robot {
 
 	private int handleOperation(String op) {
 		//Stack<Object> s =  stack;
-
+		
 		switch (op) {
 		case "+": return opApply2(op);
 
@@ -519,7 +523,7 @@ public class Robot {
 	private void useVariable(String v, int value) {
 		switch (v) {
 		case "AIM":
-			aim += Arena.fix360(value);
+			aim = Arena.fix360(value);
 			checkRadarInterrupt();
 			checkRangeInterrupt();
 			return;
@@ -529,6 +533,11 @@ public class Robot {
 			//        else
 			//           shoot( bullet_type + "_BULLET", value);
 			//        return;
+		case "ADDAIM":
+			aim += Arena.fix360(value);
+			checkRadarInterrupt();
+			checkRangeInterrupt();
+			return;
 		case "BOTTOM":
 		case "BOT":
 			return;
@@ -824,7 +833,7 @@ public class Robot {
 
 	private int popNumber() {
 		if ( stack.size() == 0) {
-			throw new Error("Stack empty");
+			throw new Error("Stack empty " + "at line " + this.ptr);
 		}
 		Object value =  stack.pop();
 		if (!(value instanceof Number)) {

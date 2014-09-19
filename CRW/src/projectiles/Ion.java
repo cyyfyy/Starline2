@@ -2,12 +2,12 @@ package projectiles;
 
 import game.Projectile;
 
-import java.awt.Image;
+import javax.swing.ImageIcon;
 
 public class Ion extends Projectile {
 
-	public Ion(int e, Image image) {
-		super(image);
+	public Ion(int e, ImageIcon ref) {
+		super(ref);
 	}
 
 }

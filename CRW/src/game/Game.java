@@ -2,14 +2,13 @@ package game;
 
 import java.awt.Canvas;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Stack;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 
@@ -38,8 +37,8 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	//set up arena
 	//TODO: Scoreboard
-	int arenaHeight = 1000;
-	int arenaWidth = 1000;
+	int arenaHeight = 300;
+	int arenaWidth = 300;
 
 	//initialize entity stacks
 	Stack<Robot> robots = new Stack<Robot>();
@@ -50,6 +49,7 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	String[] vars = {	
 			"AIM",
+			"ADDAIM",
 			"BULLET",
 			"BOTTOM",
 			"BOT",
@@ -112,10 +112,11 @@ public class Game extends Canvas implements GameWindowCallback {
 			"X",
 			"Y"
 	};
-	
-	BufferedImage ooe = null;
-	BufferedImage shield = null;
-	
+
+	ImageIcon ooe = null;
+	ImageIcon shield = null;
+	static ImageIcon ref = null;
+
 	//Robot robot1;
 	//Robot robot2;
 
@@ -129,7 +130,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	public Game() {
 		window = ResourceFactory.get().getGameWindow();
 
-		window.setResolution(1000,1000);
+		window.setResolution(300,300);
 		window.setGameWindowCallback(this);
 		window.setTitle(windowTitle);
 	}
@@ -155,7 +156,7 @@ public class Game extends Canvas implements GameWindowCallback {
 			varHash.put(i, var);
 			i++;
 		}
-		
+
 	}
 
 	/**
@@ -166,122 +167,65 @@ public class Game extends Canvas implements GameWindowCallback {
 	private void initEntities() throws FileNotFoundException {
 		// create the robots
 		//TODO: change robot graphics to odd pixel values
-		
-		BufferedImage tom = null;
-		try {
-			tom = ImageIO.read(new File("src/game/tom.png"));
-		} catch (IOException e) {
-		}
 
-		BufferedImage challenger = null;
-		try {
-			challenger = ImageIO.read(new File("src/game/doge.png"));
-		} catch (IOException e) {
-		}
-		
-		BufferedImage avery = null;
-		try {
-			avery = ImageIO.read(new File("src/game/avery.jpg"));
-		} catch (IOException e) {
-		}
-		
-		BufferedImage mikey = null;
-		try {
-			mikey = ImageIO.read(new File("src/game/mikey.jpg"));
-		} catch (IOException e) {
-		}
-		
-		BufferedImage kai = null;
-		try {
-			kai = ImageIO.read(new File("src/game/kai.jpg"));
-		} catch (IOException e) {
-		}
+		ImageIcon tom = createImageIcon("tom.png");
+		ImageIcon challenger = createImageIcon("doge.png");
+		ImageIcon gun = createImageIcon("gun.png");
+		ooe = createImageIcon("ooe.png");
+		shield = createImageIcon("shield.png");
+		ref = createImageIcon("bullet.png");
 
-		BufferedImage gun = null;
-		try {
-			gun = ImageIO.read(new File("src/game/gun.png"));
-		} catch (IOException e) {
-		}
-		
-		try {
-			ooe = ImageIO.read(new File("src/game/ooe.png"));
-		} catch (IOException e) {
-		}
-		
-		try {
-			shield = ImageIO.read(new File("src/game/shield.png"));
-		} catch (IOException e) {
-		}
-
-		//import the programs
-//		Program challengerProgram = new Program(new File("bounceRegisters.txt"));
-		//Program newguyProgram = new Program(new File("newguy.txt"));
-//		Program bounceProgram = new Program(Program.createProgram("bounceRegisters.txt"));
-//		Program followerProgram = new Program(Program.createProgram("gunturret.txt"));
-//
-//		//add robots to the game
-//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
-//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
-//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
-//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-//		addRobot(new Robot("CYRUS", followerProgram, tom,gun));
-//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
-//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
-//		addRobot(new Robot("MIKEY", bounceProgram, mikey,gun));
-//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
-//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
-//		addRobot(new Robot("ZACH", bounceProgram, challenger,gun));
-//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
-//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
-//		addRobot(new Robot("KAI", bounceProgram, kai,gun));
-//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
-//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
-//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
-//		addRobot(new Robot("AVERY", bounceProgram, avery,gun));
-
-//		addRobot(new Robot("Challenger1", challengerProgram, challenger,gun));
-		//addRobot(new Robot("Challenger2", challengerProgram, challenger,gun));
-		//addRobot(new Robot("Challenger3", challengerProgram, challenger,gun));
-		//addRobot(new Robot("Challenger4", challengerProgram, challenger,gun));
-
-		//addRobot(new Robot("Follower1", followerProgram, testy,gun));
-		//addRobot(new Robot("Follower2", followerProgram, testy,gun));
-		//addRobot(new Robot("Follower3", followerProgram, testy,gun));
-		//addRobot(new Robot("Follower4", followerProgram, testy,gun));
 		int returnVal = window.fc.showOpenDialog(Game.this);
+		
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+
+
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f1 = window.fc.getSelectedFile();
 			String path = f1.getPath();
 			path = path.replace("\\", File.separator);
-				try {
-					addRobot(new Robot("R1",new Program(Program.createProgram(path)), challenger, gun));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
+			try {
+				addRobot(new Robot("R1",new Program(Program.createProgram(path)), challenger, gun));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			//This is where a real application would open the file.
 			System.out.println("Opening file.");
 		} else {
 			System.out.println("Open command cancelled by user.");
 		}
-		
+
 		int returnVal2 = window.fc.showOpenDialog(Game.this);
 
 		if (returnVal2 == JFileChooser.APPROVE_OPTION) {
 			File f2 = window.fc.getSelectedFile();
 			String path = f2.getPath();
 			path = path.replace("\\", File.separator);
-				try {
-					addRobot(new Robot("R2",new Program(Program.createProgram(path)), tom, gun));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
+			try {
+				addRobot(new Robot("R2",new Program(Program.createProgram(path)), tom, gun));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			//This is where a real application would open the file.
 			System.out.println("Opening file.");
 		} else {
@@ -291,7 +235,6 @@ public class Game extends Canvas implements GameWindowCallback {
 	}
 
 	public static boolean isVariable(String instruction) {
-
 		return varHash.contains(instruction);
 	}
 
@@ -305,7 +248,7 @@ public class Game extends Canvas implements GameWindowCallback {
 		}
 		return false;
 	}
-	
+
 	public static boolean isRegister(String instruction) {
 		if (instruction != null && instruction.length() > 2)
 		{
@@ -316,7 +259,7 @@ public class Game extends Canvas implements GameWindowCallback {
 		}
 		return false;
 	}
-	
+
 	public static boolean isHandler(String instruction) {
 		if (instruction != null && instruction.length() > 2)
 		{
@@ -342,11 +285,6 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	protected static Projectile createProjectile(String type, int energy)
 	{
-		BufferedImage ref = null;
-		try {
-			ref = ImageIO.read(new File("src/game/bullet.png"));
-		} catch (IOException e) {
-		}
 		switch(type)
 		{
 		case "RUBBER": return new RubberBullet(energy, ref);
@@ -391,7 +329,7 @@ public class Game extends Canvas implements GameWindowCallback {
 			if(robot.alive)
 			{
 				//draw robots
-				window.getDrawGraphics().drawImage(robot.image, robot.x, robot.y, null);
+				window.getDrawGraphics().drawImage(robot.image.getImage(), robot.x, robot.y, null);
 
 				//draw aim reticule
 				//TODO: get a graphic for this
@@ -402,16 +340,18 @@ public class Game extends Canvas implements GameWindowCallback {
 				AffineTransform rotate = new AffineTransform();
 				rotate.rotate(aimRadians+Math.PI);
 				window.getDrawGraphics().translate(px, py);
-				window.getDrawGraphics().drawImage(robot.gunImage, rotate, null);
+				window.getDrawGraphics().drawImage(robot.gunImage.getImage(), rotate, null);
 				window.getDrawGraphics().translate(-px, -py);
-				
+
 				if (robot.shield > 0)
 				{
-					window.getDrawGraphics().drawImage(shield, robot.x-1, robot.y-1, null);
+					window.getDrawGraphics().drawImage(shield.getImage(), robot.x-1, robot.y-1, null);
 				}
 				if (robot.energy <= 0)//draw over shield if ooe
 				{
-					window.getDrawGraphics().drawImage(ooe, robot.x-1, robot.y-1, null);
+					robot.vx = 0;
+					robot.vy = 0;
+					window.getDrawGraphics().drawImage(ooe.getImage(), robot.x-1, robot.y-1, null);
 				}
 
 			}
@@ -433,7 +373,7 @@ public class Game extends Canvas implements GameWindowCallback {
 				else
 				{
 					//draw projectiles
-					window.getDrawGraphics().drawImage(projectile.image, projectile.x, projectile.y, null);
+					window.getDrawGraphics().drawImage(projectile.image.getImage(), projectile.x, projectile.y, null);
 				}
 			}
 		}
@@ -502,16 +442,16 @@ public class Game extends Canvas implements GameWindowCallback {
 
 
 
-	 /** Returns an ImageIcon, or null if the path was invalid. */
-    protected static ImageIcon createImageIcon(String path) {
-        java.net.URL imgURL = Game.class.getResource(path);
-        if (imgURL != null) {
-            return new ImageIcon(imgURL);
-        } else {
-        	System.err.println("Couldn't find file: " + path);
-            return null;
-        }
-    }
+	/** Returns an ImageIcon, or null if the path was invalid. */
+	protected static ImageIcon createImageIcon(String path) {
+		URL imgURL = Game.class.getResource(path);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL);
+		} else {
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
+	}
 
 
 	/**
