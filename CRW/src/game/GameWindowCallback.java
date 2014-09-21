@@ -7,5 +7,7 @@ public interface GameWindowCallback {
 	public void initialize();
 
 	public void frameRendering();
+	
+	public void load();
 
 }

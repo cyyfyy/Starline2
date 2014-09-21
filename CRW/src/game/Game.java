@@ -116,9 +116,16 @@ public class Game extends Canvas implements GameWindowCallback {
 	ImageIcon ooe = null;
 	ImageIcon shield = null;
 	static ImageIcon ref = null;
+	
+	ImageIcon tom = createImageIcon("tom.png");
+	ImageIcon challenger = createImageIcon("doge.png");
+	ImageIcon gun = createImageIcon("gun.png");
 
-	//Robot robot1;
-	//Robot robot2;
+	public Robot robot1;
+	public Robot robot2;
+	public Robot robot3;
+	public Robot robot4;
+
 
 
 	static Hashtable<Integer,String> varHash = new Hashtable<Integer,String>();
@@ -130,7 +137,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	public Game() {
 		window = ResourceFactory.get().getGameWindow();
 
-		window.setResolution(300,300);
+		window.setResolution(1000,1000);
 		window.setGameWindowCallback(this);
 		window.setTitle(windowTitle);
 	}
@@ -156,7 +163,6 @@ public class Game extends Canvas implements GameWindowCallback {
 			varHash.put(i, var);
 			i++;
 		}
-
 	}
 
 	/**
@@ -168,32 +174,33 @@ public class Game extends Canvas implements GameWindowCallback {
 		// create the robots
 		//TODO: change robot graphics to odd pixel values
 
-		ImageIcon tom = createImageIcon("tom.png");
-		ImageIcon challenger = createImageIcon("doge.png");
-		ImageIcon gun = createImageIcon("gun.png");
 		ooe = createImageIcon("ooe.png");
 		shield = createImageIcon("shield.png");
 		ref = createImageIcon("bullet.png");
 
-		int returnVal = window.fc.showOpenDialog(Game.this);
 		
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
-//		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/temp.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
+		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
 
+		
+
+
+
+		
+		
+
+		int returnVal = window.fc.showOpenDialog(Game.this);
 
 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -401,7 +408,7 @@ public class Game extends Canvas implements GameWindowCallback {
 					} else if (projectile.isStasis) {
 						a.stasis += (int)(projectile.energy / 4);
 					} else {//TODO: take damage
-						a.hull -= projectile.energy;
+						a.takeDamage(projectile.energy);
 						//	System.out.println("hull after hit: " + a.hull);
 					}
 					//}
@@ -459,6 +466,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	 * running game logic and rendering the scene.
 	 */
 	public void frameRendering() {		
+		
 		//TODO: implement game ending screen which shows the winner and maybe some stats
 		//if (robots.size() > 1)
 		//	{
@@ -476,6 +484,19 @@ public class Game extends Canvas implements GameWindowCallback {
 	 */
 	public void windowClosed() {
 		System.exit(0);
+	}
+	
+	@Override
+	public void load() {
+		if(window.p1 != null){
+			addRobot(new Robot("Robot1",window.p1,tom,gun));
+		}
+		if(window.p2 != null){
+			addRobot(new Robot("Robot2",window.p2,tom,gun));
+		}
+		if(window.p3 != null){
+			addRobot(new Robot("Robot3",window.p3,tom,gun));
+		}		
 	}
 
 	/**

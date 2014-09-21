@@ -6,21 +6,19 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.KeyStroke;
 
 /**
  * Uses Java 2D rendering to produce the scene.
@@ -37,11 +35,12 @@ public class Java2DGameWindow extends Canvas {
 
 	/** The menu bar for options */
 	private JMenuBar menuBar;
-	private JMenu menu;
+	//private JMenu menu;
 	private JButton menuItem;
 
+
 	JFileChooser fc;
-	JButton openButton;
+	private JButton openButton;
 	//private JButton saveButton;
 
 
@@ -56,8 +55,10 @@ public class Java2DGameWindow extends Canvas {
 
 	File f1;
 	File f2;
+	File f3;
 	Program p1;
 	Program p2;
+	Program p3;
 
 	/**
 	 * Create a new window to render using Java 2D. Note this will
@@ -67,21 +68,13 @@ public class Java2DGameWindow extends Canvas {
 		frame = new JFrame();
 
 		menuBar = new JMenuBar();
-		//Build the first menu.
-		menu = new JMenu("Options");
-		menu.setMnemonic(KeyEvent.VK_O);
-		menu.getAccessibleContext().setAccessibleDescription(
-				"Options menu");
 
-		//a group of JMenuItems
 		menuItem = new JButton("Start");
-		//menuItem.setMnemonic(KeyEvent.VK_T); //used constructor instead
-		//menuItem.setAccelerator(KeyStroke.getKeyStroke(
-		//		KeyEvent.VK_S, ActionEvent.ALT_MASK));
 		menuItem.getAccessibleContext().setAccessibleDescription(
 				"Start the game");
+
 		menuBar.add(menuItem);
-		menuBar.add(menu);
+
 
 		frame.setJMenuBar(menuBar);
 
@@ -90,56 +83,159 @@ public class Java2DGameWindow extends Canvas {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				gameStarted = true;
+				if (p1 != null || p2!= null || p3 != null){
+					gameStarted = true;
+				}
 			}
 
 		});
+
 		//add a file chooser
 		fc = new JFileChooser();
 
-		openButton = new JButton("Open a File...");
+		openButton = new JButton("Load a Robot...");
 		openButton.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				//Handle open button action.
-				if (e.getSource() == openButton) {
-					int returnVal = fc.showOpenDialog(Java2DGameWindow.this);
+				//Custom button text
+				Object[] options = {"Load Robot One",
+						"Load Robot Two",
+				"Load Robot Three"};
+				int n = JOptionPane.showOptionDialog(frame,
+						"Which robot do you want to load?",
+						"Load Robot...",
+						JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.QUESTION_MESSAGE,
+						null,
+						options,
+						options[2]);
 
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						f1 = fc.getSelectedFile();
-						try {
-							p1 = new Program(Program.createProgram(f1.getAbsolutePath()));
-						} catch (FileNotFoundException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+				if (n == 0)
+				{
+
+					//Handle open button action.
+					if (e.getSource() == openButton) {
+						int returnVal = fc.showOpenDialog(Java2DGameWindow.this);
+
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							f1 = fc.getSelectedFile();
+							try {
+								p1 = new Program(Program.createProgram(f1.getAbsolutePath()));
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							//This is where a real application would open the file.
+							System.out.println("Opening: " + f1.getName() + ".");
+						} else {
+							System.out.println("Open command cancelled by user.");
 						}
-						//This is where a real application would open the file.
-						System.out.println("Opening: " + f1.getName() + ".");
-					} else {
-						System.out.println("Open command cancelled by user.");
-					}
 
+					}
+				}
+				if (n == 1)
+				{
+
+					//Handle open button action.
+					if (e.getSource() == openButton) {
+						int returnVal = fc.showOpenDialog(Java2DGameWindow.this);
+
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							f2 = fc.getSelectedFile();
+							try {
+								p2 = new Program(Program.createProgram(f2.getAbsolutePath()));
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							//This is where a real application would open the file.
+							System.out.println("Opening: " + f2.getName() + ".");
+						} else {
+							System.out.println("Open command cancelled by user.");
+						}
+
+					}
+				}
+				if (n == 2)
+				{
+
+					//Handle open button action.
+					if (e.getSource() == openButton) {
+						int returnVal = fc.showOpenDialog(Java2DGameWindow.this);
+
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							f3 = fc.getSelectedFile();
+							try {
+								p3 = new Program(Program.createProgram(f3.getAbsolutePath()));
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							//This is where a real application would open the file.
+							System.out.println("Opening: " + f3.getName() + ".");
+						} else {
+							System.out.println("Open command cancelled by user.");
+						}
+
+					}
 				}
 			}
 		});
-		//menu.add(openButton);
 
-//		//Create the save button.  We use the image from the JLF
-//		//Graphics Repository (but we extracted it from the jar).
-//		saveButton = new JButton("Save a File...",
-//				createImageIcon("images/Save16.gif"));
-//		saveButton.addActionListener(this);
-//
-//		//For layout purposes, put the buttons in a separate panel
-//		JPanel buttonPanel = new JPanel(); //use FlowLayout
-//		buttonPanel.add(openButton);
-//		buttonPanel.add(saveButton);
-//
-//		//Add the buttons and the log to this panel.
-//		add(buttonPanel, BorderLayout.PAGE_START);
-//		add(logScrollPane, BorderLayout.CENTER);
+		//			File f1 = window.fc.getSelectedFile();
+		//			String path = f1.getPath();
+		//			path = path.replace("\\", File.separator);
+		//			try {
+		//				addRobot(new Robot("R1",new Program(Program.createProgram(path)), challenger, gun));
+		//			} catch (IOException e) {
+		//				// TODO Auto-generated catch block
+		//				e.printStackTrace();
+		//			}
+		//
+		//			//This is where a real application would open the file.
+		//			System.out.println("Opening file.");
+		//		} else {
+		//			System.out.println("Open command cancelled by user.");
+		//		}
+		//
+		//		int returnVal2 = window.fc.showOpenDialog(Game.this);
+		//
+		//		if (returnVal2 == JFileChooser.APPROVE_OPTION) {
+		//			File f2 = window.fc.getSelectedFile();
+		//			String path = f2.getPath();
+		//			path = path.replace("\\", File.separator);
+		//			try {
+		//				addRobot(new Robot("R2",new Program(Program.createProgram(path)), tom, gun));
+		//			} catch (IOException e) {
+		//				// TODO Auto-generated catch block
+		//				e.printStackTrace();
+		//			}
+		//
+		//			//This is where a real application would open the file.
+		//			System.out.println("Opening file.");
+		//		} else {
+		//			System.out.println("Open command cancelled by user.");
+		//		}
+		//
+		//	}
+		menuBar.add(openButton);
+
+		//		//Create the save button.  We use the image from the JLF
+		//		//Graphics Repository (but we extracted it from the jar).
+		//		saveButton = new JButton("Save a File...",
+		//				createImageIcon("images/Save16.gif"));
+		//		saveButton.addActionListener(this);
+		//
+		//		//For layout purposes, put the buttons in a separate panel
+		//		JPanel buttonPanel = new JPanel(); //use FlowLayout
+		//		buttonPanel.add(openButton);
+		//		buttonPanel.add(saveButton);
+		//
+		//		//Add the buttons and the log to this panel.
+		//		add(buttonPanel, BorderLayout.PAGE_START);
+		//		add(logScrollPane, BorderLayout.CENTER);
 
 		////Handle save button action.
 		//} else if (e.getSource() == saveButton) {
@@ -186,7 +282,7 @@ public class Java2DGameWindow extends Canvas {
 		// get hold the content of the frame and set up the resolution of the game
 
 		JPanel panel = (JPanel) frame.getContentPane();
-		panel.setPreferredSize(new Dimension(300,300));
+		panel.setPreferredSize(new Dimension(1000,1000));
 		panel.setLayout(null);
 
 
@@ -293,7 +389,7 @@ public class Java2DGameWindow extends Canvas {
 
 			g = (Graphics2D) strategy.getDrawGraphics();
 			g.setColor(Color.white);
-			g.fillRect(0,0,300,300);
+			g.fillRect(0,0,1000,1000);
 
 			// finally, we've completed drawing so clear up the graphics
 			// and flip the buffer over
@@ -312,7 +408,7 @@ public class Java2DGameWindow extends Canvas {
 
 			g = (Graphics2D) strategy.getDrawGraphics();
 			g.setColor(Color.white);
-			g.fillRect(0,0,300,300);
+			g.fillRect(0,0,1000,1000);
 
 			if (callback != null) {
 				callback.frameRendering();

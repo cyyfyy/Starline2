@@ -90,14 +90,14 @@ public class Arena {
 				t = m*(c-a) + n*(d-b);
 				// First a crude Manhattan Metric check
 				if (t > 0 && Math.abs((m+n)*t+a+b-c-d) < 20) {
-				//	double radiusSquared = rob.radius * rob.radius;
-				//	double test = (m*t+a-c)*(m*t+a-c) + (n*t+b-d)*(n*t+b-d);
-				//	if (test < (radiusSquared-8)) {
+					double radiusSquared = rob.radius * rob.radius;
+					double test = (m*t+a-c)*(m*t+a-c) + (n*t+b-d)*(n*t+b-d);
+					if (test < (radiusSquared-8)) {
 						// in sights
 						if (dist == 0 || t < dist) {
 							dist = (int)t;
 							target = rob;
-				//		}
+						}
 					}
 				}
 			}
