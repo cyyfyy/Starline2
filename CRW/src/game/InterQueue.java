@@ -6,6 +6,8 @@ import java.util.PriorityQueue;
 public class InterQueue {
 
 	boolean enabled;
+	
+	int arenaSize = 300;
 
 	private PriorityQueue<String> queue;
 
@@ -35,11 +37,11 @@ public class InterQueue {
 		params.put("DAMAGE",150);
 		params.put("SHIELD",25);
 		params.put("TOP",20);
-		params.put("BOTTOM",280);
+		params.put("BOTTOM",arenaSize - 20);
 		params.put("LEFT",20);
-		params.put("RIGHT",280);
-		params.put("RADAR",300);
-		params.put("RANGE",300);
+		params.put("RIGHT",arenaSize - 20);
+		params.put("RADAR",arenaSize);
+		params.put("RANGE",arenaSize);
 		params.put("CHRONON",0);
 
 		for (String name:INames) {

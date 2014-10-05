@@ -9,5 +9,11 @@ public interface GameWindowCallback {
 	public void frameRendering();
 	
 	public void load();
+	
+	public void pause();
+
+	public void reset();
+
+
 
 }

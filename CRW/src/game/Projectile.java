@@ -17,7 +17,7 @@ public abstract class Projectile {
 	protected boolean isStasis;
 	protected int speed;
 	public ImageIcon image;
-	boolean active;
+	protected boolean active;
 
 
 	protected Projectile(ImageIcon ref)
@@ -42,12 +42,12 @@ public abstract class Projectile {
 		 y += speedY;
 	}
 
-	void onContact()
+	protected void onContact()
 	{
 
 	}
 	
-	boolean isHarmful()
+	protected boolean isHarmful()
 	{
 		return true;
 	}
@@ -55,5 +55,4 @@ public abstract class Projectile {
 	public boolean isActive() {
 		return active;
 	}
-
 }

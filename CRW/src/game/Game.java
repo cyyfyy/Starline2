@@ -1,16 +1,15 @@
 package game;
 
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.geom.AffineTransform;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Stack;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import projectiles.ExplosiveBullet;
 import projectiles.Hellbore;
@@ -28,7 +27,7 @@ import projectiles.TacNuke;
 public class Game extends Canvas implements GameWindowCallback {
 
 	/** The window that is being used to render the game */
-	private Java2DGameWindow window;
+	protected static Java2DGameWindow window;
 
 	private Arena arena;
 
@@ -37,15 +36,16 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	//set up arena
 	//TODO: Scoreboard
-	int arenaHeight = 300;
-	int arenaWidth = 300;
+	static int arenaHeight = 300;
+	static int arenaWidth = 300;
 
 	//initialize entity stacks
-	Stack<Robot> robots = new Stack<Robot>();
+	static Stack<Robot> robots = new Stack<Robot>();
 	Stack<Projectile> projectiles = new Stack<Projectile>();
 
 	//TODO: speed controls
 	int time = 0; 
+	boolean paused = false;
 
 	String[] vars = {	
 			"AIM",
@@ -105,7 +105,7 @@ public class Game extends Canvas implements GameWindowCallback {
 			"SND9",
 			"SPEEDX",
 			"SPEEDY",
-			"STUNNER",
+			"ION",
 			"TEAMMATES",
 			"TOP",
 			"WALL",
@@ -116,9 +116,15 @@ public class Game extends Canvas implements GameWindowCallback {
 	ImageIcon ooe = null;
 	ImageIcon shield = null;
 	static ImageIcon ref = null;
-	
+	static ImageIcon explosive = null;
+	static ImageIcon det = null;
+	static ImageIcon hellbore = null;
+	static ImageIcon ion = null;
+
+
+
 	ImageIcon tom = createImageIcon("tom.png");
-	ImageIcon challenger = createImageIcon("doge.png");
+	ImageIcon challenger = createImageIcon("challenger.png");
 	ImageIcon gun = createImageIcon("gun.png");
 
 	public Robot robot1;
@@ -137,7 +143,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	public Game() {
 		window = ResourceFactory.get().getGameWindow();
 
-		window.setResolution(1000,1000);
+		window.setResolution(window.arenaSize,window.arenaSize);
 		window.setGameWindowCallback(this);
 		window.setTitle(windowTitle);
 	}
@@ -171,74 +177,15 @@ public class Game extends Canvas implements GameWindowCallback {
 	 * @throws FileNotFoundException 
 	 */
 	private void initEntities() throws FileNotFoundException {
-		// create the robots
 		//TODO: change robot graphics to odd pixel values
 
 		ooe = createImageIcon("ooe.png");
 		shield = createImageIcon("shield.png");
 		ref = createImageIcon("bullet.png");
-
-		
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-		addRobot(new Robot("R1",new Program(Program.createProgram("src/game/bounce.txt")), challenger, gun));
-
-		
-
-
-
-		
-		
-
-		int returnVal = window.fc.showOpenDialog(Game.this);
-
-
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File f1 = window.fc.getSelectedFile();
-			String path = f1.getPath();
-			path = path.replace("\\", File.separator);
-			try {
-				addRobot(new Robot("R1",new Program(Program.createProgram(path)), challenger, gun));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			//This is where a real application would open the file.
-			System.out.println("Opening file.");
-		} else {
-			System.out.println("Open command cancelled by user.");
-		}
-
-		int returnVal2 = window.fc.showOpenDialog(Game.this);
-
-		if (returnVal2 == JFileChooser.APPROVE_OPTION) {
-			File f2 = window.fc.getSelectedFile();
-			String path = f2.getPath();
-			path = path.replace("\\", File.separator);
-			try {
-				addRobot(new Robot("R2",new Program(Program.createProgram(path)), tom, gun));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			//This is where a real application would open the file.
-			System.out.println("Opening file.");
-		} else {
-			System.out.println("Open command cancelled by user.");
-		}
-
+		explosive = createImageIcon("ex_bullet.png");
+		det = createImageIcon("det.png");
+		hellbore = createImageIcon("hellbore.png");
+		ion = createImageIcon("ion.png");
 	}
 
 	public static boolean isVariable(String instruction) {
@@ -296,11 +243,11 @@ public class Game extends Canvas implements GameWindowCallback {
 		{
 		case "RUBBER": return new RubberBullet(energy, ref);
 		case "NORMAL": return new NormalBullet(energy, ref);
-		case "EXPLOSIVE": return new ExplosiveBullet(energy, ref);
-		case "HELLBORE": return new Hellbore(energy, ref);
+		case "EXPLOSIVE": return new ExplosiveBullet(energy, explosive);
+		case "HELLBORE": return new Hellbore(energy, hellbore);
 		case "MINE": return new Mine(energy, ref);
 		case "NUKE": return new Missile(energy, ref);
-		case "ION": return new Ion(energy, ref);
+		case "ION": return new Ion(energy, ion);
 		case "MISSILE": return new TacNuke(energy, ref);
 		default: return null;
 		}
@@ -308,143 +255,148 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	void loop()
 	{
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		time++;
-		if (time % 50 == 0)
-		{
-			System.out.println(time/50);
-			for(Robot robotScore: robots)
+		if(!paused){
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			time++;
+//			if (time % 50 == 0)
+//			{
+//				System.out.println(time/50);
+//				for(Robot robotScore: robots)
+//				{
+//					System.out.println(robotScore.name+ ": "+robotScore.hull);
+//				}
+//			}
+
+			//update robots
+			for(Robot robot: robots)
 			{
-				System.out.println(robotScore.name+ ": "+robotScore.hull);
-			}
-		}
-
-		//update robots
-		for(Robot robot: robots)
-		{
-			int x = robot.x;
-			int y = robot.y;
-			int r = robot.radius + 2;
-			robot.touchingWall = (x < r || y < r || x > (arenaWidth - r) || y > (arenaHeight - r));
+				int x = robot.x;
+				int y = robot.y;
+				int r = robot.radius + 2;
+				robot.touchingWall = (x < r || y < r || x > (arenaWidth - r) || y > (arenaHeight - r));
 
 
-			robot.step();
-			if(robot.alive)
-			{
-				//draw robots
-				window.getDrawGraphics().drawImage(robot.image.getImage(), robot.x, robot.y, null);
-
-				//draw aim reticule
-				//TODO: get a graphic for this
-				double aimRadians = robot.aim * (Math.PI + Math.PI) / 360;
-
-				int px = (int) (robot.x+2 +(robot.radius/2));
-				int py = (int) (robot.y+2 + (robot.radius/2));
-				AffineTransform rotate = new AffineTransform();
-				rotate.rotate(aimRadians+Math.PI);
-				window.getDrawGraphics().translate(px, py);
-				window.getDrawGraphics().drawImage(robot.gunImage.getImage(), rotate, null);
-				window.getDrawGraphics().translate(-px, -py);
-
-				if (robot.shield > 0)
+				robot.step();
+				if(robot.alive)
 				{
-					window.getDrawGraphics().drawImage(shield.getImage(), robot.x-1, robot.y-1, null);
-				}
-				if (robot.energy <= 0)//draw over shield if ooe
-				{
-					robot.vx = 0;
-					robot.vy = 0;
-					window.getDrawGraphics().drawImage(ooe.getImage(), robot.x-1, robot.y-1, null);
-				}
+					//draw robots
+					window.getDrawGraphics().drawImage(robot.image.getImage(), robot.x, robot.y, null);
 
-			}
-		}
+					//draw aim reticule
+					double aimRadians = robot.aim * (Math.PI + Math.PI) / 360;
 
+					int px = (int) (robot.x+2 +(robot.radius/2));
+					int py = (int) (robot.y+2 + (robot.radius/2));
+					AffineTransform rotate = new AffineTransform();
+					rotate.rotate(aimRadians+Math.PI);
+					window.getDrawGraphics().translate(px, py);
+					window.getDrawGraphics().drawImage(robot.gunImage.getImage(), rotate, null);
+					window.getDrawGraphics().translate(-px, -py);
 
-		//update projectiles
-		for(Projectile projectile: projectiles)
-		{
-			if (projectile.isActive()){
-				projectile.step();
-				int x = projectile.x;
-				int y = projectile.y;
-				int r = projectile.radius;
-				if (x < -r || y < -r || x > (arenaWidth + r) || y > (arenaHeight + r))
-				{
-					projectile.active = false;
-				}
-				else
-				{
-					//draw projectiles
-					window.getDrawGraphics().drawImage(projectile.image.getImage(), projectile.x, projectile.y, null);
-				}
-			}
-		}
-
-		for (Robot a: robots) {
-			for (Robot b: robots) {
-				if (a == b) continue;
-				if (a.isTouching(b)) {
-					a.colliding = b.colliding = true;
-					a.vx = b.vx = 0;
-					a.vy = b.vy = 0;
-				}
-			}
-			for (Projectile projectile: projectiles) {
-				if(!projectile.isActive())
-				{
-					continue;
-				}
-				if (a.isTouching(projectile)) {
-					projectile.onContact();
-					//if (projectile.is_harmful()) {
-					projectile.active = false;
-					if (projectile.isEmp) {
-						a.energy = 0;
-					} else if (projectile.isStasis) {
-						a.stasis += (int)(projectile.energy / 4);
-					} else {//TODO: take damage
-						a.takeDamage(projectile.energy);
-						//	System.out.println("hull after hit: " + a.hull);
+					if (robot.shield > 0)
+					{
+						window.getDrawGraphics().drawImage(shield.getImage(), robot.x-1, robot.y-1, null);
 					}
-					//}
+					if (robot.energy <= 0)//draw over shield if ooe
+					{
+						//robot.vx = 0;
+						//robot.vy = 0;
+						window.getDrawGraphics().drawImage(ooe.getImage(), robot.x-1, robot.y-1, null);
+					}
+
 				}
 			}
-			if (a.colliding)
+
+
+			//update projectiles
+			for(Projectile projectile: projectiles)
 			{
-				a.wasColliding = true;
-				a.colliding = false;
+				if (projectile.isActive()){
+					projectile.step();
+					int x = projectile.x;
+					int y = projectile.y;
+					int r = projectile.radius;
+					if (x < -r || y < -r || x > (arenaWidth + r) || y > (arenaHeight + r))
+					{
+						projectile.active = false;
+					}
+					else
+					{
+						//draw projectiles
+						if(projectile instanceof ExplosiveBullet && projectile.speedX == 0)
+						{
+							window.getDrawGraphics().drawImage(det.getImage(), projectile.x - 25, projectile.y - 25, null);
+						}
+						else
+						{
+							window.getDrawGraphics().drawImage(projectile.image.getImage(), projectile.x, projectile.y, null);
+						}
+					}
+				}
 			}
-		}
-		//TODO: update scoreboard
 
-		//remove projectiles and robots
-		Object[] pro = projectiles.toArray();
-		for(Object projectile: pro)
-		{
-			if(projectile instanceof Projectile){
-				if (!((Projectile) projectile).isActive())
+			for (Robot a: robots) {
+				for (Robot b: robots) {
+					if (a == b) continue;
+					if (a.isTouching(b)) {
+						a.colliding = b.colliding = true;
+						a.vx = b.vx = 0;
+						a.vy = b.vy = 0;
+					}
+				}
+				for (Projectile projectile: projectiles) {
+					if(!projectile.isActive())
+					{
+						continue;
+					}
+					if (a.isTouching(projectile)) {
+						projectile.onContact();
+						if (projectile.isHarmful()) {
+							projectile.active = false;
+							if (projectile.isEmp) {
+								a.energy = 0;
+							} else if (projectile.isStasis) {
+								a.stasis += (projectile.energy / 4);
+							} else {
+								a.takeDamage(projectile.energy);
+							}
+						}
+					}
+				}
+				if (a.colliding)
 				{
-					projectiles.remove(projectile);
+					a.wasColliding = true;
+					a.colliding = false;
+				}
+			}
+			//TODO: update scoreboard
+
+			//remove projectiles and robots
+			Object[] pro = projectiles.toArray();
+			for(Object projectile: pro)
+			{
+				if(projectile instanceof Projectile){
+					if (!((Projectile) projectile).isActive())
+					{
+						projectiles.remove(projectile);
+					}
+				}
+			}
+			Object[] r = robots.toArray();
+			for(Object rob: r)
+			{
+				if(rob instanceof Robot){
+					if (!((Robot) rob).alive)
+					{
+						robots.remove(rob);
+					}
 				}
 			}
 		}
-		Object[] r = robots.toArray();
-		for(Object rob: r)
-		{
-			if(rob instanceof Robot){
-				if (!((Robot) rob).alive)
-				{
-					robots.remove(rob);
-				}
-			}
-		}
-
-
 	}
 
 
@@ -455,6 +407,11 @@ public class Game extends Canvas implements GameWindowCallback {
 		if (imgURL != null) {
 			return new ImageIcon(imgURL);
 		} else {
+			window.error = "Couldn't find file: " + path;
+			window.getDrawGraphics().translate(arenaWidth, 0);
+			window.drawScore(window.getDrawGraphics(), robots);
+			window.getDrawGraphics().translate(-arenaWidth, 0);
+			window.getDrawGraphics().drawLine(arenaWidth+5, 0, arenaWidth+5, arenaHeight);
 			System.err.println("Couldn't find file: " + path);
 			return null;
 		}
@@ -467,16 +424,30 @@ public class Game extends Canvas implements GameWindowCallback {
 	 */
 	public void frameRendering() {		
 		
-		//TODO: implement game ending screen which shows the winner and maybe some stats
-		//if (robots.size() > 1)
-		//	{
-		loop();
-		//	}
-		//	else
-		//	{
-		//		System.out.println("Winner is: " + robots.peek().name);
-		//		System.exit(0);
-		//	}
+		window.getDrawGraphics().translate(arenaWidth, 0);
+		window.drawScore(window.getDrawGraphics(), robots);
+		window.getDrawGraphics().translate(-arenaWidth, 0);
+		window.getDrawGraphics().drawLine(arenaWidth+5, 0, arenaWidth+5, arenaHeight);
+
+		if (robots.size() > 1)
+		{
+			loop();
+		}
+		else
+		{
+			window.winner = robots.peek().name.substring(0, robots.peek().name.indexOf('.')).toUpperCase();
+			window.getDrawGraphics().setColor(Color.RED);
+			window.getDrawGraphics().drawString("Winner:" + window.winner, arenaWidth + 10, 200);
+			window.getDrawGraphics().dispose();
+			window.strategy.show();
+			System.out.println("Winner is: " + robots.peek().name);
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			reset();
+		}
 	}
 
 	/**
@@ -485,18 +456,25 @@ public class Game extends Canvas implements GameWindowCallback {
 	public void windowClosed() {
 		System.exit(0);
 	}
-	
+
 	@Override
 	public void load() {
 		if(window.p1 != null){
-			addRobot(new Robot("Robot1",window.p1,tom,gun));
+			addRobot(new Robot(window.f1.getName(),window.p1,challenger,gun));
+			//window.p1 = null;
 		}
 		if(window.p2 != null){
-			addRobot(new Robot("Robot2",window.p2,tom,gun));
+			addRobot(new Robot(window.f2.getName(),window.p2,challenger,gun));
+			//window.p2 = null;
 		}
 		if(window.p3 != null){
-			addRobot(new Robot("Robot3",window.p3,tom,gun));
-		}		
+			addRobot(new Robot(window.f3.getName(),window.p3,challenger,gun));
+			//window.p3 = null;
+		}
+		if(window.p4 != null){
+			addRobot(new Robot(window.f4.getName(),window.p4,challenger,gun));
+			//window.p4 = null;
+		}	
 	}
 
 	/**
@@ -507,5 +485,22 @@ public class Game extends Canvas implements GameWindowCallback {
 	public static void main(String argv[]) {
 		Game g = new Game();
 		g.startGame();
+	}
+
+	@Override
+	public void pause() {
+		paused = !paused;
+	}
+
+	@Override
+	public void reset() {
+		window.gameStarted = false;
+		paused = true;
+		window.winner = "";
+		window.error = "";
+		robots.clear();
+		projectiles.clear();
+		time = 0; 
+		paused = false;
 	}
 }

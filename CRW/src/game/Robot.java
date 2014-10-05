@@ -84,7 +84,7 @@ public class Robot {
 		vy = 0;
 		interrupts = new InterQueue();
 		stack = new Stack<Object>();
-		bulletType = "NORMAL";
+		bulletType = "EXPLOSIVE";
 	}
 
 	public boolean equals(Robot other)
@@ -101,13 +101,9 @@ public class Robot {
 	 */
 	protected void step() {
 		chronons++;
-		//	System.out.println("------ " +  chronons + " ------");
-
 		if ( stasis > 0) {
 			stasis--;
 
-
-			System.out.println("In stasis for " +  stasis + " more chronons");
 			return;
 		}
 
@@ -133,6 +129,11 @@ public class Robot {
 		if (energy < -200) alive = false;
 		if (hull <= 0)  colliding = false;
 		if (energy < -200)  colliding = false;
+		
+		if (energy < 0)
+		{
+			return;
+		}
 
 		if (shield > maxShield)
 		{
@@ -213,14 +214,12 @@ public class Robot {
 
 		for (int i =  processorSpeed; i > 0 &&  alive; ) {
 			if ( energy <= 0) {
-				//System.out.println("Robot has no energy");
 				break;
 			}
 			try {
 				if (interrupts.enabled && interrupts.hasNext()) {
 					interrupts.enabled = false;
 					String next = interrupts.next();
-					//System.out.println("Executing interrupt " + next);
 					opCall(interrupts.getPtr(next));
 				}
 				// Some instructions have no cost, like DEBUG, thus they return 0.
@@ -230,6 +229,10 @@ public class Robot {
 				String instruction = program.instructions[last_ptr];
 				String message = name + " error on line " + line + ", at " + instruction;
 				System.out.println(message + "\n\n" + e);
+				Game.window.error = name + " error on line " + line + ", at " + instruction;
+				Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+				Game.window.getDrawGraphics().dispose();
+				Game.window.strategy.show();
 				colliding = false;
 				i-=1;
 			}
@@ -256,10 +259,23 @@ public class Robot {
 		String instruction = in.toUpperCase();
 
 		if (ptr >= program.numberOfInstructions)
+		{
+			Game.window.error = "Program finished excecution" + " in Robot " + name; 
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Program finished");
+		}
 		if (instruction == null)
-			throw new Error("Undefined instruction: " + instruction);
-
+		{
+			Game.window.error = "Undefined instruction: " + instruction;
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
+			throw new Error("Undefined instruction: " + instruction + " in Robot " + name);
+			
+		}
+		
 		last_ptr = ptr;
 		ptr++;
 
@@ -368,7 +384,7 @@ public class Robot {
 			//			 push((value < 0 || value > 100) ? 0 : value);
 			//			return 1;
 			//
-		case "IF": //TODO: MAKE THIS WORK WITH VARIABLES
+		case "IF":
 			int first = popNumber();
 			int second = popNumber();
 			if (second == 1) {
@@ -495,8 +511,23 @@ public class Robot {
 			String p = popVariable();
 			stack.push(getVariable(p));
 			return 0;
+			
+		case "BULLETSWITCH":
+			if (bulletType.equals("NORMAL"))
+			{
+				bulletType = "EXPLOSIVE";
+			}
+			else if(bulletType.equals("EXPLOSIVE"))
+			{
+				bulletType = "NORMAL";
+			}
+			return 1; //TODO: should this cost an action
 
 		default:
+			Game.window.error = "Unknown instruction: " + op + " in Robot " + name;
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Unknown instruction: " + op);
 		}
 	}
@@ -510,10 +541,18 @@ public class Robot {
 
 	private String popVariable() {
 		if ( stack.size() == 0) {
+			Game.window.error = "Stack empty in Robot " + name;
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 60, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Stack empty");
 		}
 		Object value =  stack.pop();
 		if (!(value instanceof String)) {
+			Game.window.error = "Invalid value on stack: " + value + " is not a Variable" + " in Robot " + name;
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Invalid value on stack: " + value + " is not a Variable");
 		} else {
 			return (String) value;
@@ -559,8 +598,8 @@ public class Robot {
 			//			throw new Error("Teamplay not yet implemented");
 			//		case "HISTORY":
 			//			return;
-			//		case "HELLBORE":
-			//			 shoot(name, value);
+		case "HELLBORE":
+			 shoot("HELLBORE", value);
 			//			return;
 			//		case "ICON0":
 			//		case "ICON1":
@@ -648,8 +687,8 @@ public class Robot {
 		case "SPEEDY":
 			setSpeed("y", value);
 			return;
-			//	      case "STUNNER":
-			//	         shoot(name, value);
+		case "ION":
+	         shoot("ION", value);
 			//	        return;
 			//	      case "TEAMMATES":
 			//	        throw new Error("Teamplay not yet implemented");
@@ -658,6 +697,10 @@ public class Robot {
 			return;
 		case "X":
 		case "Y":
+			Game.window.error = "Robot " + name + " tried to teleport by setting X or Y";
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Robot tried to teleport by setting X or Y");
 
 			//default:
@@ -681,6 +724,10 @@ public class Robot {
 		case "BOT":
 			return 0;
 		case "CHANNEL":
+			Game.window.error = "Channel variable not usable, teamplay not yet implemented";
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Teamplay not yet implemented");
 		case "CHRONON":
 			return chronons;
@@ -833,10 +880,18 @@ public class Robot {
 
 	private int popNumber() {
 		if ( stack.size() == 0) {
+			Game.window.error = "Stack empty " + "at line " + this.ptr + " in Robot " + name;
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Stack empty " + "at line " + this.ptr);
 		}
 		Object value =  stack.pop();
 		if (!(value instanceof Number)) {
+			Game.window.error = "Invalid value on stack: " + value + " is not a Number" + " in Robot " + name;
+			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
+			Game.window.getDrawGraphics().dispose();
+			Game.window.strategy.show();
 			throw new Error("Invalid value on stack: " + value + " is not a Number");
 		} else {
 			return (int) value;
@@ -934,7 +989,6 @@ public class Robot {
 			shield = 0;
 			hull -= remainder;
 		}
-		//System.out.println(hull);
 	}
 
 	protected void checkRadarInterrupt() {
@@ -949,7 +1003,6 @@ public class Robot {
 		int range = arena.doRange(this);
 		if (range != 0 && range <= interrupts.getParam("RANGE"))
 		{
-			//System.out.println(range);
 			interrupts.add("RANGE");
 		}
 	}

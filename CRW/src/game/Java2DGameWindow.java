@@ -3,6 +3,7 @@ package game;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,7 +12,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.Stack;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -26,23 +27,26 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class Java2DGameWindow extends Canvas {
 	/** The strategy that allows us to use accelerate page flipping */
-	private BufferStrategy strategy;
-	/** True if the game is currently "running", i.e. the game loop is looping */
+	protected BufferStrategy strategy;
+	/** True if the game is currently "running", i.e. the window is showing */
 	boolean gameRunning = true;
+	/** True if the game is currently "playing", i.e. the game loop is looping */
 	boolean gameStarted = false;
 	/** The frame in which we'll display our canvas */
 	protected JFrame frame;
+	
+	protected String error = "";
+	protected String winner = "";
 
 	/** The menu bar for options */
 	private JMenuBar menuBar;
-	//private JMenu menu;
 	private JButton menuItem;
+	private JButton stopButton;
+
 
 
 	JFileChooser fc;
 	private JButton openButton;
-	//private JButton saveButton;
-
 
 	/** The width of the display */
 	private int width;
@@ -56,9 +60,13 @@ public class Java2DGameWindow extends Canvas {
 	File f1;
 	File f2;
 	File f3;
+	File f4;
 	Program p1;
 	Program p2;
 	Program p3;
+	Program p4;
+
+	int arenaSize = 300;
 
 	/**
 	 * Create a new window to render using Java 2D. Note this will
@@ -66,7 +74,22 @@ public class Java2DGameWindow extends Canvas {
 	 */
 	public Java2DGameWindow() {
 		frame = new JFrame();
+		addMenuBar();
 
+
+	}
+
+	/**
+	 * Set the title that should be displayed on the window
+	 * 
+	 * @param title The title to display on the window 
+	 */
+	public void setTitle(String title) {
+		frame.setTitle(title);
+	}
+
+	private void addMenuBar()
+	{
 		menuBar = new JMenuBar();
 
 		menuItem = new JButton("Start");
@@ -83,12 +106,26 @@ public class Java2DGameWindow extends Canvas {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (p1 != null || p2!= null || p3 != null){
+				if (p1 != null || p2!= null || p3 != null || p4 !=null){
 					gameStarted = true;
 				}
 			}
 
 		});
+
+		stopButton = new JButton("Reset");
+		stopButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (callback != null)
+				{
+					callback.reset();
+				}
+			}
+		});
+
+		menuBar.add(stopButton);
 
 		//add a file chooser
 		fc = new JFileChooser();
@@ -102,15 +139,15 @@ public class Java2DGameWindow extends Canvas {
 				//Custom button text
 				Object[] options = {"Load Robot One",
 						"Load Robot Two",
-				"Load Robot Three"};
+						"Load Robot Three", "Load Robot Four"};
 				int n = JOptionPane.showOptionDialog(frame,
 						"Which robot do you want to load?",
 						"Load Robot...",
-						JOptionPane.YES_NO_CANCEL_OPTION,
+						JOptionPane.DEFAULT_OPTION,
 						JOptionPane.QUESTION_MESSAGE,
 						null,
 						options,
-						options[2]);
+						options[0]);
 
 				if (n == 0)
 				{
@@ -181,84 +218,33 @@ public class Java2DGameWindow extends Canvas {
 
 					}
 				}
+				if (n == 3)
+				{
+
+					//Handle open button action.
+					if (e.getSource() == openButton) {
+						int returnVal = fc.showOpenDialog(Java2DGameWindow.this);
+
+						if (returnVal == JFileChooser.APPROVE_OPTION) {
+							f4 = fc.getSelectedFile();
+							try {
+								p4 = new Program(Program.createProgram(f4.getAbsolutePath()));
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							//This is where a real application would open the file.
+							System.out.println("Opening: " + f4.getName() + ".");
+						} else {
+							System.out.println("Open command cancelled by user.");
+						}
+
+					}
+				}
 			}
 		});
 
-		//			File f1 = window.fc.getSelectedFile();
-		//			String path = f1.getPath();
-		//			path = path.replace("\\", File.separator);
-		//			try {
-		//				addRobot(new Robot("R1",new Program(Program.createProgram(path)), challenger, gun));
-		//			} catch (IOException e) {
-		//				// TODO Auto-generated catch block
-		//				e.printStackTrace();
-		//			}
-		//
-		//			//This is where a real application would open the file.
-		//			System.out.println("Opening file.");
-		//		} else {
-		//			System.out.println("Open command cancelled by user.");
-		//		}
-		//
-		//		int returnVal2 = window.fc.showOpenDialog(Game.this);
-		//
-		//		if (returnVal2 == JFileChooser.APPROVE_OPTION) {
-		//			File f2 = window.fc.getSelectedFile();
-		//			String path = f2.getPath();
-		//			path = path.replace("\\", File.separator);
-		//			try {
-		//				addRobot(new Robot("R2",new Program(Program.createProgram(path)), tom, gun));
-		//			} catch (IOException e) {
-		//				// TODO Auto-generated catch block
-		//				e.printStackTrace();
-		//			}
-		//
-		//			//This is where a real application would open the file.
-		//			System.out.println("Opening file.");
-		//		} else {
-		//			System.out.println("Open command cancelled by user.");
-		//		}
-		//
-		//	}
 		menuBar.add(openButton);
-
-		//		//Create the save button.  We use the image from the JLF
-		//		//Graphics Repository (but we extracted it from the jar).
-		//		saveButton = new JButton("Save a File...",
-		//				createImageIcon("images/Save16.gif"));
-		//		saveButton.addActionListener(this);
-		//
-		//		//For layout purposes, put the buttons in a separate panel
-		//		JPanel buttonPanel = new JPanel(); //use FlowLayout
-		//		buttonPanel.add(openButton);
-		//		buttonPanel.add(saveButton);
-		//
-		//		//Add the buttons and the log to this panel.
-		//		add(buttonPanel, BorderLayout.PAGE_START);
-		//		add(logScrollPane, BorderLayout.CENTER);
-
-		////Handle save button action.
-		//} else if (e.getSource() == saveButton) {
-		//int returnVal = fc.showSaveDialog(FileChooserDemo.this);
-		//if (returnVal == JFileChooser.APPROVE_OPTION) {
-		//File file = fc.getSelectedFile();
-		////This is where a real application would save the file.
-		//log.append("Saving: " + file.getName() + "." + newline);
-		//} else {
-		//log.append("Save command cancelled by user." + newline);
-		//}
-		//log.setCaretPosition(log.getDocument().getLength());
-		//}
-		//}
-	}
-
-	/**
-	 * Set the title that should be displayed on the window
-	 * 
-	 * @param title The title to display on the window 
-	 */
-	public void setTitle(String title) {
-		frame.setTitle(title);
 	}
 
 	/**
@@ -282,7 +268,7 @@ public class Java2DGameWindow extends Canvas {
 		// get hold the content of the frame and set up the resolution of the game
 
 		JPanel panel = (JPanel) frame.getContentPane();
-		panel.setPreferredSize(new Dimension(1000,1000));
+		panel.setPreferredSize(new Dimension(arenaSize+250,arenaSize)); //250 for scoreboard
 		panel.setLayout(null);
 
 
@@ -290,7 +276,7 @@ public class Java2DGameWindow extends Canvas {
 
 		// setup our canvas size and put it into the content of the frame
 
-		setBounds(0,0,width,height);
+		setBounds(0,0,width+250,height); //250 for scoreboard
 		panel.add(this);
 
 		// Tell AWT not to bother repainting our canvas since we're
@@ -373,11 +359,45 @@ public class Java2DGameWindow extends Canvas {
 		return g;
 	}
 
+	protected void drawScore(Graphics2D g, Stack<Robot> robots)
+	{
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("Courier New", Font.BOLD, 15));
+		for(int i = 0; i < robots.size(); i ++)
+		{
+			if(i == 0 || i == 1){
+				Robot rob = robots.get(i);
+				String name = rob.name.substring(0,rob.name.indexOf('.'));
+				g.drawString(name.toUpperCase(), 10 + getWidth()/4 * i, 22);
+				g.drawString("Energy:" + rob.energy, 10 + getWidth()/4 * i, 40);
+				g.drawString("Active:" + rob.alive, 10 + getWidth()/4 * i, 55);
+				g.drawString("Hull:" + rob.hull, 10 + getWidth()/4 * i, 70);
+				g.drawString("Shield:" + rob.shield, 10 + getWidth()/4 * i, 85);
+			}
+			else if(i == 2 || i == 3)
+			{
+				Robot rob = robots.get(i);
+				String name = rob.name.substring(0,rob.name.indexOf('.'));
+				g.drawString(name.toUpperCase(), 10 + getWidth()/4 * ((i-1)/2), 112);
+				g.drawString("Energy:" + rob.energy, 10 + getWidth()/4 * ((i-1)/2), 130);
+				g.drawString("Active:" + rob.alive, 10 + getWidth()/4 * ((i-1)/2), 145);
+				g.drawString("Hull:" + rob.hull, 10 + getWidth()/4 * ((i-1)/2), 160);
+				g.drawString("Shield:" + rob.shield, 10 + getWidth()/4 * ((i-1)/2), 175);
+			}
+		}
+		g.drawString("Winner:" + winner, 10 + getWidth()/4 * 0, 200);
+		g.drawString("Error:" + error, 10 + getWidth()/4 * 0, 225);
+
+
+
+
+	}
+
 	/**
 	 * Run the main game loop. This method keeps rendering the scene
 	 * and requesting that the callback update its screen.
 	 */
-	private void preGameLoop() {
+	void preGameLoop() {
 		while (gameRunning) {
 			if(gameStarted)
 			{
@@ -389,7 +409,8 @@ public class Java2DGameWindow extends Canvas {
 
 			g = (Graphics2D) strategy.getDrawGraphics();
 			g.setColor(Color.white);
-			g.fillRect(0,0,1000,1000);
+			g.fillRect(0,0,arenaSize+250,arenaSize);
+
 
 			// finally, we've completed drawing so clear up the graphics
 			// and flip the buffer over
@@ -401,6 +422,9 @@ public class Java2DGameWindow extends Canvas {
 		gameLoop();
 	}
 	private void gameLoop() {
+		if (callback != null) {
+			callback.load();
+		}
 		while (gameStarted) {
 			// Get hold of a graphics context for the accelerated 
 
@@ -408,7 +432,7 @@ public class Java2DGameWindow extends Canvas {
 
 			g = (Graphics2D) strategy.getDrawGraphics();
 			g.setColor(Color.white);
-			g.fillRect(0,0,1000,1000);
+			g.fillRect(0,0,arenaSize+250,arenaSize);
 
 			if (callback != null) {
 				callback.frameRendering();
@@ -421,6 +445,7 @@ public class Java2DGameWindow extends Canvas {
 			g.dispose();
 			strategy.show();
 		}
+		preGameLoop();
 	}
 }
 
