@@ -7,10 +7,7 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Stack;
-
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-
 import projectiles.ExplosiveBullet;
 import projectiles.Hellbore;
 import projectiles.Ion;
@@ -35,7 +32,6 @@ public class Game extends Canvas implements GameWindowCallback {
 	private String windowTitle = "Starline2_0_1";
 
 	//set up arena
-	//TODO: Scoreboard
 	static int arenaHeight = 300;
 	static int arenaWidth = 300;
 
@@ -115,17 +111,16 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	ImageIcon ooe = null;
 	ImageIcon shield = null;
+	ImageIcon challenger = createImageIcon("challenger.png");
+	ImageIcon gun = createImageIcon("gun.png");
+	
 	static ImageIcon ref = null;
 	static ImageIcon explosive = null;
 	static ImageIcon det = null;
 	static ImageIcon hellbore = null;
 	static ImageIcon ion = null;
 
-
-
-	ImageIcon tom = createImageIcon("tom.png");
-	ImageIcon challenger = createImageIcon("challenger.png");
-	ImageIcon gun = createImageIcon("gun.png");
+	
 
 	public Robot robot1;
 	public Robot robot2;
@@ -140,15 +135,16 @@ public class Game extends Canvas implements GameWindowCallback {
 	/**
 	 * Construct our game and set it running.
 	 */
-	public Game() {
+	public Game()
+	{
 		window = ResourceFactory.get().getGameWindow();
-
 		window.setResolution(window.arenaSize,window.arenaSize);
 		window.setGameWindowCallback(this);
 		window.setTitle(windowTitle);
 	}
 
-	public void startGame() {
+	public void startGame()
+	{
 		arena = new Arena(this, arenaHeight, arenaWidth);
 		try {
 			initEntities();
@@ -188,11 +184,13 @@ public class Game extends Canvas implements GameWindowCallback {
 		ion = createImageIcon("ion.png");
 	}
 
-	public static boolean isVariable(String instruction) {
+	public static boolean isVariable(String instruction) 
+	{
 		return varHash.contains(instruction);
 	}
 
-	public static boolean isComment(String instruction) {
+	public static boolean isComment(String instruction)
+	{
 		if (instruction != null && instruction.length() > 2)
 		{
 			if (instruction.startsWith("//"))
@@ -203,7 +201,8 @@ public class Game extends Canvas implements GameWindowCallback {
 		return false;
 	}
 
-	public static boolean isRegister(String instruction) {
+	public static boolean isRegister(String instruction)
+	{
 		if (instruction != null && instruction.length() > 2)
 		{
 			if (instruction.startsWith("##"))
@@ -214,7 +213,8 @@ public class Game extends Canvas implements GameWindowCallback {
 		return false;
 	}
 
-	public static boolean isHandler(String instruction) {
+	public static boolean isHandler(String instruction) 
+	{
 		if (instruction != null && instruction.length() > 2)
 		{
 			if (instruction.startsWith("@@"))
@@ -255,21 +255,14 @@ public class Game extends Canvas implements GameWindowCallback {
 
 	void loop()
 	{
-		if(!paused){
+		if(!paused)
+		{
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			time++;
-//			if (time % 50 == 0)
-//			{
-//				System.out.println(time/50);
-//				for(Robot robotScore: robots)
-//				{
-//					System.out.println(robotScore.name+ ": "+robotScore.hull);
-//				}
-//			}
 
 			//update robots
 			for(Robot robot: robots)
@@ -286,7 +279,7 @@ public class Game extends Canvas implements GameWindowCallback {
 					//draw robots
 					window.getDrawGraphics().drawImage(robot.image.getImage(), robot.x, robot.y, null);
 
-					//draw aim reticule
+					//draw aim reticle
 					double aimRadians = robot.aim * (Math.PI + Math.PI) / 360;
 
 					int px = (int) (robot.x+2 +(robot.radius/2));
@@ -303,8 +296,6 @@ public class Game extends Canvas implements GameWindowCallback {
 					}
 					if (robot.energy <= 0)//draw over shield if ooe
 					{
-						//robot.vx = 0;
-						//robot.vy = 0;
 						window.getDrawGraphics().drawImage(ooe.getImage(), robot.x-1, robot.y-1, null);
 					}
 
@@ -315,7 +306,8 @@ public class Game extends Canvas implements GameWindowCallback {
 			//update projectiles
 			for(Projectile projectile: projectiles)
 			{
-				if (projectile.isActive()){
+				if (projectile.isActive())
+				{
 					projectile.step();
 					int x = projectile.x;
 					int y = projectile.y;
@@ -339,29 +331,40 @@ public class Game extends Canvas implements GameWindowCallback {
 				}
 			}
 
-			for (Robot a: robots) {
-				for (Robot b: robots) {
+			for (Robot a: robots) 
+			{
+				for (Robot b: robots)
+				{
 					if (a == b) continue;
-					if (a.isTouching(b)) {
+					if (a.isTouching(b))
+					{
 						a.colliding = b.colliding = true;
 						a.vx = b.vx = 0;
 						a.vy = b.vy = 0;
 					}
 				}
-				for (Projectile projectile: projectiles) {
+				for (Projectile projectile: projectiles)
+				{
 					if(!projectile.isActive())
 					{
 						continue;
 					}
-					if (a.isTouching(projectile)) {
+					if (a.isTouching(projectile))
+					{
 						projectile.onContact();
-						if (projectile.isHarmful()) {
+						if (projectile.isHarmful()) 
+						{
 							projectile.active = false;
-							if (projectile.isEmp) {
+							if (projectile.isEmp)
+							{
 								a.energy = 0;
-							} else if (projectile.isStasis) {
+							} 
+							else if (projectile.isStasis)
+							{
 								a.stasis += (projectile.energy / 4);
-							} else {
+							} 
+							else 
+							{
 								a.takeDamage(projectile.energy);
 							}
 						}
@@ -373,13 +376,13 @@ public class Game extends Canvas implements GameWindowCallback {
 					a.colliding = false;
 				}
 			}
-			//TODO: update scoreboard
-
+			
 			//remove projectiles and robots
 			Object[] pro = projectiles.toArray();
 			for(Object projectile: pro)
 			{
-				if(projectile instanceof Projectile){
+				if(projectile instanceof Projectile)
+				{
 					if (!((Projectile) projectile).isActive())
 					{
 						projectiles.remove(projectile);
@@ -389,7 +392,8 @@ public class Game extends Canvas implements GameWindowCallback {
 			Object[] r = robots.toArray();
 			for(Object rob: r)
 			{
-				if(rob instanceof Robot){
+				if(rob instanceof Robot)
+				{
 					if (!((Robot) rob).alive)
 					{
 						robots.remove(rob);
@@ -402,16 +406,16 @@ public class Game extends Canvas implements GameWindowCallback {
 
 
 	/** Returns an ImageIcon, or null if the path was invalid. */
-	protected static ImageIcon createImageIcon(String path) {
+	protected static ImageIcon createImageIcon(String path)
+	{
 		URL imgURL = Game.class.getResource(path);
-		if (imgURL != null) {
+		if (imgURL != null)
+		{
 			return new ImageIcon(imgURL);
-		} else {
+		}
+		else
+		{
 			window.error = "Couldn't find file: " + path;
-			window.getDrawGraphics().translate(arenaWidth, 0);
-			window.drawScore(window.getDrawGraphics(), robots);
-			window.getDrawGraphics().translate(-arenaWidth, 0);
-			window.getDrawGraphics().drawLine(arenaWidth+5, 0, arenaWidth+5, arenaHeight);
 			System.err.println("Couldn't find file: " + path);
 			return null;
 		}
@@ -476,17 +480,7 @@ public class Game extends Canvas implements GameWindowCallback {
 			//window.p4 = null;
 		}	
 	}
-
-	/**
-	 * This begins the game.
-	 * 
-	 * @param argv The arguments that are passed into our game
-	 */
-	public static void main(String argv[]) {
-		Game g = new Game();
-		g.startGame();
-	}
-
+	
 	@Override
 	public void pause() {
 		paused = !paused;
@@ -502,5 +496,15 @@ public class Game extends Canvas implements GameWindowCallback {
 		projectiles.clear();
 		time = 0; 
 		paused = false;
+	}
+
+	/**
+	 * This begins the game.
+	 * 
+	 * @param argv The arguments that are passed into our game
+	 */
+	public static void main(String argv[]) {
+		Game g = new Game();
+		g.startGame();
 	}
 }

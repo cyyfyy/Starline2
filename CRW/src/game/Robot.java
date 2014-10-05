@@ -15,34 +15,36 @@ public class Robot {
 	int y;
 	int radius;
 	int energy;
-
 	int stasis;
-
-	boolean touchingWall;
-	boolean alive;
-	boolean colliding;
-	double aim;
-
 	int processorSpeed;
 	int maxEnergy;
 	int maxShield;
-	Arena arena;
 	int shield;
 	int chronons;
 	int vx; //speedX
 	int vy; //speedY
+	int look;
+	int last_ptr;
+	int ptr;
+
+	boolean touchingWall;
+	boolean alive;
+	boolean colliding;
 	boolean wasColliding;
 	boolean wasOnWall;
-	InterQueue interrupts;
 	boolean wasAtTop;
 	boolean wasAtBottom;
 	boolean wasAtLeft;
 	boolean wasAtRight;
-	public double scan;
-	int look;
 	
-	int last_ptr;
-	int ptr;
+	double aim;
+	double scan;
+
+
+	
+	Arena arena;
+	InterQueue interrupts;
+
 	Stack<Object> stack;
 	String bulletType;
 
@@ -99,15 +101,18 @@ public class Robot {
 	/**
 	 * Robot processes its instructions
 	 */
-	protected void step() {
+	protected void step() 
+	{
 		chronons++;
-		if ( stasis > 0) {
+		if ( stasis > 0) 
+		{
 			stasis--;
 
 			return;
 		}
 
-		if(aim > 360){
+		if(aim > 360)
+		{
 			aim = (aim%360);
 		}
 
@@ -144,59 +149,87 @@ public class Robot {
 			shield = (int) Math.max(0, shield - 1);
 		}
 
-		if (interrupts.enabled) {
-			if (colliding) {
-				if (!wasColliding) {
+		if (interrupts.enabled) 
+		{
+			if (colliding)
+			{
+				if (!wasColliding)
+				{
 					interrupts.add("COLLISION");
 					wasColliding = true;
-				} else {
+				} 
+				else
+				{
 					wasColliding = false;
 				}
 			}
-			if (touchingWall) {
-				if (!wasOnWall) {
+			if (touchingWall)
+			{
+				if (!wasOnWall)
+				{
 					interrupts.add("WALL");
 					wasOnWall = true;
-				} else {
+				} 
+				else 
+				{
 					wasOnWall = false;
 				}
 			}
 
 			if ( hull <  interrupts.getParam("DAMAGE"))
+			{
 				interrupts.add("DAMAGE");
+			}
 			if ( shield <  interrupts.getParam("SHIELD"))
+			{
 				interrupts.add("SHIELD");
-
-			if ( y <  interrupts.getParam("TOP")) {
-				if (! wasAtTop) {
+			}
+			if ( y <  interrupts.getParam("TOP")) 
+			{
+				if (! wasAtTop) 
+				{
 					interrupts.add("TOP");
 					wasAtTop = true;
 				}
-			} else {
+			} 
+			else 
+			{
 				wasAtTop = false;
 			}
-			if ( y >  interrupts.getParam("BOTTOM")) {
-				if (! wasAtBottom) {
+			if ( y >  interrupts.getParam("BOTTOM")) 
+			{
+				if (! wasAtBottom) 
+				{
 					interrupts.add("BOTTOM");
 					wasAtBottom = true;
 				}
-			} else {
+			} 
+			else
+			{
 				wasAtBottom = false;
 			}
-			if ( x <  interrupts.getParam("LEFT")) {
-				if (! wasAtLeft) {
+			if ( x <  interrupts.getParam("LEFT"))
+			{
+				if (! wasAtLeft) 
+				{
 					interrupts.add("LEFT");
 					wasAtLeft = true;
 				}
-			} else {
+			} 
+			else
+			{
 				wasAtLeft = false;
 			}
-			if ( x >  interrupts.getParam("RIGHT")) {
-				if (! wasAtRight) {
+			if ( x >  interrupts.getParam("RIGHT")) 
+			{
+				if (! wasAtRight) 
+				{
 					interrupts.add("RIGHT");
 					wasAtRight = true;
 				}
-			} else {
+			} 
+			else 
+			{
 				wasAtRight = false;
 			}
 
@@ -207,24 +240,31 @@ public class Robot {
 			// TODO: SIGNAL interrupt. Teamplay not yet implemented.
 			// TODO: ROBOTS interrupt.
 
-			if ( chronons >=  interrupts.getParam("CHRONON")) {
+			if ( chronons >=  interrupts.getParam("CHRONON")) 
+			{
 				interrupts.add("CHRONON");
 			}
 		}
 
-		for (int i =  processorSpeed; i > 0 &&  alive; ) {
-			if ( energy <= 0) {
+		for (int i =  processorSpeed; i > 0 &&  alive; ) 
+		{
+			if ( energy <= 0)
+			{
 				break;
 			}
-			try {
-				if (interrupts.enabled && interrupts.hasNext()) {
+			try 
+			{
+				if (interrupts.enabled && interrupts.hasNext()) 
+				{
 					interrupts.enabled = false;
 					String next = interrupts.next();
 					opCall(interrupts.getPtr(next));
 				}
 				// Some instructions have no cost, like DEBUG, thus they return 0.
 				i -= stepOne();
-			} catch (Exception e) {
+			} 
+			catch (Exception e) 
+			{
 				int line = last_ptr;
 				String instruction = program.instructions[last_ptr];
 				String message = name + " error on line " + line + ", at " + instruction;
@@ -356,7 +396,6 @@ public class Robot {
 			int i =  popNumber();
 			int j =  popNumber();
 			double result = Math.atan2(-i, j);  // Flip Y coord.
-			// Robowar's Engine/Arena.c does this, so I will:
 			stack.push((int)(450.5 - Arena.rad2deg(result)) % 360);
 			return 1;
 			//			//		case "DIST":
@@ -501,9 +540,12 @@ public class Robot {
 			//System.out.println("BEEP!");
 			return 0;
 		case "PRINT":
-			if (stack.size() > 0) {
+			if (stack.size() > 0) 
+			{
 				System.out.println("Stack size " + stack.size() + ", top value: " + stack.peek());
-			} else {
+			} 
+			else 
+			{
 				System.out.println("Stack is empty.");
 			}
 			return 0;
@@ -532,15 +574,18 @@ public class Robot {
 		}
 	}
 
-	private int opJump(int popNumber) {
+	private int opJump(int popNumber) 
+	{
 		int address = popNumber;
 		//  trace('Go to',  program.address_to_label[address]);
 		ptr = address;
 		return 1;
 	}
 
-	private String popVariable() {
-		if ( stack.size() == 0) {
+	private String popVariable()
+	{
+		if ( stack.size() == 0) 
+		{
 			Game.window.error = "Stack empty in Robot " + name;
 			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 60, 225);
 			Game.window.getDrawGraphics().dispose();
@@ -548,19 +593,24 @@ public class Robot {
 			throw new Error("Stack empty");
 		}
 		Object value =  stack.pop();
-		if (!(value instanceof String)) {
+		if (!(value instanceof String)) 
+		{
 			Game.window.error = "Invalid value on stack: " + value + " is not a Variable" + " in Robot " + name;
 			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
 			Game.window.getDrawGraphics().dispose();
 			Game.window.strategy.show();
 			throw new Error("Invalid value on stack: " + value + " is not a Variable");
-		} else {
+		} 
+		else
+		{
 			return (String) value;
 		}
 	}
 
-	private void useVariable(String v, int value) {
-		switch (v) {
+	private void useVariable(String v, int value)
+	{
+		switch (v) 
+		{
 		case "AIM":
 			aim = Arena.fix360(value);
 			checkRadarInterrupt();
@@ -653,16 +703,22 @@ public class Robot {
 			//			return;
 		case "SHIELD":
 			value = Math.max(0, value);
-			if ( shield < value) {
+			if ( shield < value)
+			{
 				int cost = value -  shield;
-				if ( energy < cost) {
+				if ( energy < cost)
+				{
 					shield += ( energy);
 					energy = 0;
-				} else {
+				} 
+				else
+				{
 					shield = value;
 					energy -= cost;
 				}
-			} else if ( shield > value) {
+			} 
+			else if ( shield > value)
+			{
 				int gain =  shield - value;
 				shield = value;
 				energy = Math.min( energy + gain,  maxEnergy);
@@ -708,14 +764,10 @@ public class Robot {
 		}
 	}
 
-	int getVariable(String name) {
-		// Resolve label names first. Some simpler bots have label names with the
-		// same name as variables.
-		//  if (name in  program.label_to_address) {
-		//    return  program.label_to_address[name];
-		//  }
-
-		switch (name) {
+	int getVariable(String name) 
+	{
+		switch (name) 
+		{
 		case "AIM":
 			return (int) aim;
 		case "BULLET":
@@ -836,7 +888,8 @@ public class Robot {
 		int distance = (int)(energy / 2);
 		energy -= (int)(energy);
 		int r =  radius;
-		switch (axis) {
+		switch (axis)
+		{
 		case "x":
 			x = Math.max(r, Math.min( arena.width - r,  x + distance));
 			break;
@@ -851,7 +904,8 @@ public class Robot {
 		int value = speedParam;
 		if (Math.abs(value) > 5)//set max speed
 		{
-			if(value < 0){
+			if(value < 0)
+			{
 				value = -5;
 			}
 			else
@@ -859,7 +913,8 @@ public class Robot {
 				value = 5;
 			}
 		}
-		switch (axis) {
+		switch (axis)
+		{
 		case "x":
 			int differenceX = Math.abs(vx - value) * 2;
 			energy -= differenceX;
@@ -872,14 +927,17 @@ public class Robot {
 		}
 	}
 
-	private void shoot(String type, int amount) {
+	private void shoot(String type, int amount)
+	{
 		amount = Math.min(amount,  maxEnergy);
 		arena.shoot(this, type, amount);
 		energy -= amount;
 	}
 
-	private int popNumber() {
-		if ( stack.size() == 0) {
+	private int popNumber()
+	{
+		if ( stack.size() == 0)
+		{
 			Game.window.error = "Stack empty " + "at line " + this.ptr + " in Robot " + name;
 			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
 			Game.window.getDrawGraphics().dispose();
@@ -887,19 +945,24 @@ public class Robot {
 			throw new Error("Stack empty " + "at line " + this.ptr);
 		}
 		Object value =  stack.pop();
-		if (!(value instanceof Number)) {
+		if (!(value instanceof Number))
+		{
 			Game.window.error = "Invalid value on stack: " + value + " is not a Number" + " in Robot " + name;
 			Game.window.getDrawGraphics().drawString("Error:" + Game.window.error, arena.width + 10, 225);
 			Game.window.getDrawGraphics().dispose();
 			Game.window.strategy.show();
 			throw new Error("Invalid value on stack: " + value + " is not a Number");
-		} else {
+		} 
+		else
+		{
 			return (int) value;
 		}
 	}
 
-	private int opTrig(String op) {
-		switch (op) {
+	private int opTrig(String op)
+	{
+		switch (op)
+		{
 		case "SIN": stack.push((int)(popNumber() * Math.sin(popNumber()))); return 1;
 		case "COS": return 1;//TODO
 		case "TAN": return 1;//TODO
@@ -916,8 +979,10 @@ public class Robot {
 	//
 	//	}
 
-	private int opApply2(String op) {
-		switch (op) {
+	private int opApply2(String op)
+	{
+		switch (op)
+		{
 		case "+": stack.push(popNumber() + popNumber()); return 1;
 		case "-": stack.push(popNumber() - popNumber()); return 1;
 		case "*": stack.push(popNumber() * popNumber()); return 1;
@@ -943,7 +1008,8 @@ public class Robot {
 		return  distanceTo(other) <= 0;
 	}
 
-	protected double distanceTo(Robot other) {
+	protected double distanceTo(Robot other)
+	{
 		if (other != null)
 		{
 			Robot a = this;
@@ -962,7 +1028,8 @@ public class Robot {
 		}
 	}
 
-	protected double distanceTo(Projectile other) {
+	protected double distanceTo(Projectile other) 
+	{
 		if (other != null)
 		{
 			Robot a = this;
@@ -991,7 +1058,8 @@ public class Robot {
 		}
 	}
 
-	protected void checkRadarInterrupt() {
+	protected void checkRadarInterrupt()
+	{
 		double radar = arena.doRadar(this);
 		if (radar != 0 && radar <= interrupts.getParam("RADAR"))
 		{
