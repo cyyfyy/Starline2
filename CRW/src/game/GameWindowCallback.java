@@ -1,6 +1,7 @@
 package game;
 
-public interface GameWindowCallback {
+public interface GameWindowCallback
+{
 
 	public void windowClosed();
 
@@ -13,7 +14,5 @@ public interface GameWindowCallback {
 	public void pause();
 
 	public void reset();
-
-
 
 }

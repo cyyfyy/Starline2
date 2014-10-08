@@ -4,7 +4,8 @@ import java.util.Stack;
 
 import javax.swing.ImageIcon;
 
-public class Robot {
+public class Robot
+{
 	String name;
 	Program program;
 	ImageIcon image;
@@ -36,12 +37,12 @@ public class Robot {
 	boolean wasAtBottom;
 	boolean wasAtLeft;
 	boolean wasAtRight;
-	
+
 	double aim;
 	double scan;
 
 
-	
+
 	Arena arena;
 	InterQueue interrupts;
 
@@ -86,7 +87,7 @@ public class Robot {
 		vy = 0;
 		interrupts = new InterQueue();
 		stack = new Stack<Object>();
-		bulletType = "EXPLOSIVE";
+		bulletType = "NORMAL";
 	}
 
 	public boolean equals(Robot other)
@@ -107,7 +108,6 @@ public class Robot {
 		if ( stasis > 0) 
 		{
 			stasis--;
-
 			return;
 		}
 
@@ -134,7 +134,7 @@ public class Robot {
 		if (energy < -200) alive = false;
 		if (hull <= 0)  colliding = false;
 		if (energy < -200)  colliding = false;
-		
+
 		if (energy < 0)
 		{
 			return;
@@ -313,9 +313,9 @@ public class Robot {
 			Game.window.getDrawGraphics().dispose();
 			Game.window.strategy.show();
 			throw new Error("Undefined instruction: " + instruction + " in Robot " + name);
-			
+
 		}
-		
+
 		last_ptr = ptr;
 		ptr++;
 
@@ -355,7 +355,7 @@ public class Robot {
 
 	private int handleOperation(String op) {
 		//Stack<Object> s =  stack;
-		
+
 		switch (op) {
 		case "+": return opApply2(op);
 
@@ -372,15 +372,15 @@ public class Robot {
 		case ">": return opApply2(op);
 
 		case "<": return opApply2(op);
-		//
-		//		case "AND": return opApply2(op);
-		//
-		//		case "OR": return opApply2(op);
+		
+		case "AND": return opApply2(op);
+		
+		case "OR": return opApply2(op);
 		//
 		//		case "XOR": case "EOR": return opApply2(op);
 		//
 		//		case "ABS": return opApply1(op);
-		//		case "CHS": return opApply1(op);
+		case "CHS": return opApply2(op);
 		//		case "MAX": return opApply2(op);
 		//		case "MIN": return opApply2(op);
 		//		case "MOD": return opApply2(op);
@@ -553,7 +553,7 @@ public class Robot {
 			String p = popVariable();
 			stack.push(getVariable(p));
 			return 0;
-			
+
 		case "BULLETSWITCH":
 			if (bulletType.equals("NORMAL"))
 			{
@@ -642,6 +642,7 @@ public class Robot {
 		case "ENERGY":
 			return;
 		case "FIRE":
+		case "BULLET":
 			shoot( bulletType, value);
 			return;
 			//		case "FRIEND":
@@ -649,7 +650,7 @@ public class Robot {
 			//		case "HISTORY":
 			//			return;
 		case "HELLBORE":
-			 shoot("HELLBORE", value);
+			shoot("HELLBORE", value);
 			//			return;
 			//		case "ICON0":
 			//		case "ICON1":
@@ -744,7 +745,7 @@ public class Robot {
 			setSpeed("y", value);
 			return;
 		case "ION":
-	         shoot("ION", value);
+			shoot("ION", value);
 			//	        return;
 			//	      case "TEAMMATES":
 			//	        throw new Error("Teamplay not yet implemented");
@@ -902,15 +903,16 @@ public class Robot {
 	private void setSpeed(String axis, int speedParam) 
 	{
 		int value = speedParam;
-		if (Math.abs(value) > 5)//set max speed
+		int MAX_SPEED = 5;
+		if (Math.abs(value) > MAX_SPEED)//set max speed
 		{
 			if(value < 0)
 			{
-				value = -5;
+				value = -MAX_SPEED;
 			}
 			else
 			{
-				value = 5;
+				value = MAX_SPEED;
 			}
 		}
 		switch (axis)
@@ -964,12 +966,12 @@ public class Robot {
 		switch (op)
 		{
 		case "SIN": stack.push((int)(popNumber() * Math.sin(popNumber()))); return 1;
-		case "COS": return 1;//TODO
-		case "TAN": return 1;//TODO
-		case "ARCSIN": return 0;//TODO
-		case "ARCCOS": return 0;//TODO
-		//case "ARCTAN":
-
+		case "COS": stack.push((int)(popNumber() * Math.cos(popNumber()))); return 1;
+		case "TAN": stack.push((int)(popNumber() * Math.tan(popNumber()))); return 1;
+		case "ARCSIN": stack.push((int)(popNumber() * Math.asin(popNumber()))); return 1;
+		case "ARCCOS": stack.push((int)(popNumber() * Math.acos(popNumber()))); return 1;
+		//case "ARCTAN": stack.push((int)(popNumber() * Math.atan(popNumber()))); return 1;
+		//special case for arctan to flip Y corr
 		}
 		return 1;
 	}
@@ -991,9 +993,10 @@ public class Robot {
 		case "!": stack.push(popNumber() != popNumber() ? 1 : 0); return 1;
 		case ">": stack.push(popNumber() > popNumber() ? 1 : 0); return 1;
 		case "<": stack.push(popNumber() < popNumber() ? 1 : 0); return 1;
-
-		//  case "AND": stack.push(popVariable() && popVariable() ? 1 : 0); return 1;
-		//  case "OR": return  op_apply2(function(a, b) { return a || b ? 1 : 0 });
+		case "AND": stack.push(popNumber() == 1 && popNumber() == 1 ? 1 : 0); return 1;
+		case "OR": stack.push(popNumber() == 1 || popNumber() == 1 ? 1 : 0); return 1;
+		case "CHS": stack.push(popNumber()*(-1)); return 1;
+		
 		}
 		return 1;
 	}

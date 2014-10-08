@@ -33,7 +33,6 @@ public abstract class Projectile {
 		this.speedY = 0; // Set by caller.
 		this.image = ref;
 		this.active = true;
-
 	}
 
 	protected void step()

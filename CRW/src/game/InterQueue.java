@@ -90,21 +90,31 @@ public class InterQueue {
 			return false;
 		}
 		// Use this call to prune any interrupts that point to address -1.
-		while (queue.size() > 0) {
+		while (queue.size() > 0)
+		{
 			String next = queue.peek();
 			if (ptrs.get(next) == -1)
+			{
 				queue.remove(next); // Remove it!
+			}
 			else
+			{
 				return true;
+			}
 		}
 		return false;  // I guess they all pointed to -1...
 	}
 
-	public String next() {
+	public String next()
+	{
 		if (queue.size() > 0)
+		{
 			return queue.poll();
+		}
 		else
+		{
 			throw new Error("Internal error: Tried getting next interrupt signal but none queued");
+		}
 	}
 
 }

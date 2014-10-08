@@ -29,7 +29,7 @@ public class Game extends Canvas implements GameWindowCallback {
 	private Arena arena;
 
 	/** The normal title of the window */
-	private String windowTitle = "Starline2_0_1";
+	private String windowTitle = "Starline2_0_2";
 
 	//set up arena
 	static int arenaHeight = 300;
@@ -345,7 +345,7 @@ public class Game extends Canvas implements GameWindowCallback {
 				}
 				for (Projectile projectile: projectiles)
 				{
-					if(!projectile.isActive())
+					if(!projectile.isActive() && !(projectile instanceof ExplosiveBullet))
 					{
 						continue;
 					}
@@ -437,16 +437,29 @@ public class Game extends Canvas implements GameWindowCallback {
 		{
 			loop();
 		}
-		else
+		else if (robots.size() == 1)
 		{
 			window.winner = robots.peek().name.substring(0, robots.peek().name.indexOf('.')).toUpperCase();
 			window.getDrawGraphics().setColor(Color.RED);
 			window.getDrawGraphics().drawString("Winner:" + window.winner, arenaWidth + 10, 200);
 			window.getDrawGraphics().dispose();
 			window.strategy.show();
-			System.out.println("Winner is: " + robots.peek().name);
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			reset();
+		}
+		else
+		{
+			window.winner = "TIED!";
+			window.getDrawGraphics().setColor(Color.RED);
+			window.getDrawGraphics().drawString("Winner:" + window.winner, arenaWidth + 10, 200);
+			window.getDrawGraphics().dispose();
+			window.strategy.show();
+			try {
+				Thread.sleep(4000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
